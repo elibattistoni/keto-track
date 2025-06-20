@@ -11,17 +11,202 @@ brew install postgresql
 brew services start postgresql
 ```
 
-- **Windows:**
-  Download and install from [postgresql.org/download](https://www.postgresql.org/download/).
-- **Linux:**
+The command
 
 ```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-sudo service postgresql start
+brew services start postgresql
 ```
 
+or
+
+```bash
+brew services start postgresql@14
+```
+
+does the same thing
+
+**does the following:**
+
+- **Starts the PostgreSQL database server** on your Mac as a background service (daemon).
+- Ensures PostgreSQL automatically runs after you restart your computer.
+- Makes PostgreSQL available system-wide, so you can connect to it from your terminal, apps, or GUI tools.
+
+### **Details**
+
+| Part of Command | What it Does                                                                    |
+| :-------------- | :------------------------------------------------------------------------------ |
+| `brew`          | Homebrew, the popular macOS package manager                                     |
+| `services`      | Homebrew’s subcommand for managing background services (like databases, redis)  |
+| `start`         | Tells Homebrew to launch the service and keep it running                        |
+| `postgresql`    | Specifies the service you want to manage (here: the PostgreSQL database server) |
+
 ---
+
+### **Why/When to Use It?**
+
+- **After installing PostgreSQL via Homebrew**, you need to start the server before you can use it.
+- **If you restart your Mac**, this command ensures PostgreSQL starts up automatically.
+- You only need to run this once (unless you stop or restart the service).
+
+---
+
+### **Related Commands**
+
+| Command                            | What it Does                           |
+| :--------------------------------- | :------------------------------------- |
+| `brew services stop postgresql`    | Stops the PostgreSQL service           |
+| `brew services restart postgresql` | Restarts the PostgreSQL service        |
+| `brew services list`               | Shows all services managed by Homebrew |
+
+---
+
+**Summary:**  
+`brew services start postgresql` ensures your PostgreSQL server is running in the background on your Mac, ready for your apps to connect to.
+
+## Step 1.2: Setup Postgres
+
+Run
+
+```bash
+psql
+```
+
+When you run `psql` with no arguments, it tries to:
+
+- Connect to the local PostgreSQL server
+- Use your **macOS username** as both the **database name** and the **user**
+
+### **Alternative 1: Connect to the Default Database**
+
+Postgres often creates a database called `postgres` by default.  
+Try connecting to it:
+
+```bash
+psql -d postgres
+```
+
+this command above worked successfully 👍🏻
+
+or, if you want to specify the user (your username):
+
+```bash
+psql -U yourMacOSusername -d postgres
+```
+
+### **Alternative 2: Create the Database Named After Your User**
+
+You can create a database with your username (while connected as a superuser):
+
+1. Connect to the default database (as above).
+2. Run:
+   ```sql
+   CREATE DATABASE yourMacOSusername;
+   ```
+3. Check the db was created: list all databases
+
+   ```sql
+   \l
+   ```
+
+   check roles: list all roles
+
+   ```sql
+   \du
+   ```
+
+4. exit the psql connection with:
+   ```sql
+   \q
+   ```
+   and press `Enter`
+5. Now running `psql` by itself should work (which is the same as `psql -U yourMacOSusername`)
+
+### **Alternative 3: Specify the Database you want to connect to**
+
+```bash
+psql -d keto_track
+```
+
+### **Summary Table**
+
+| What you want to do      | Command                                 |
+| :----------------------- | :-------------------------------------- |
+| Connect to default db    | `psql -d postgres`                      |
+| Connect as specific user | `psql -U yourMacOSusername -d postgres` |
+| Connect to your app db   | `psql -d keto_track`                    |
+
+### **Tip: Creating Your App Database**
+
+If you haven’t already, create your app database (from `psql -d postgres`):
+
+```sql
+CREATE DATABASE keto_track;
+```
+
+### **Create the `postgres` User (Role), optional**
+
+If you want to use `postgres` as your database user (recommended for tutorials and consistency):
+
+1. **Connect as the existing user** (your macOS username):
+
+   ```bash
+   psql
+   ```
+
+2. **Create the `postgres` role with superuser privileges:**
+
+   ```sql
+   CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD 'yourpassword';
+   ```
+
+   - Replace `'yourpassword'` with a secure password you choose.
+
+3. **Exit psql:**
+
+   ```
+   \q
+   ```
+
+4. **Now try connecting as `postgres`:**
+
+   ```bash
+   psql -U postgres
+   ```
+
+   - Enter the password you set above.
+
+### **Setup a password for your main user** TODO IMPORTANT
+
+# HEREEEEE TODO
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+# HEREEEEE
+
+## **Step 3: Alternative — Use Your Current User**
+
+If you don’t want to create a `postgres` user, just use your current user in your `.env` and Prisma configs:
+
+```
+DATABASE_URL="postgresql://yourMacOSusername@localhost:5432/keto_track"
+```
+
+<br>
+<br>
 
 ## Step 2: Create Your Database
 
@@ -42,6 +227,9 @@ CREATE DATABASE nutrition_app;
 Exit with `\q`.
 
 ---
+
+<br>
+<br>
 
 ## Step 3: Add Prisma to Your Next.js Project
 
@@ -65,6 +253,9 @@ This creates:
 
 ---
 
+<br>
+<br>
+
 ## Step 4: Configure Database Connection
 
 Open the generated `.env` file and set the connection string:
@@ -77,6 +268,9 @@ DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/nutrition_app"
 - Never commit this file with real secrets to GitHub!
 
 ---
+
+<br>
+<br>
 
 ## Step 5: Define Your Data Models
 
@@ -111,6 +305,9 @@ model NutritionValue {
 
 ---
 
+<br>
+<br>
+
 ## Step 6: Run Migrations
 
 Apply your schema to the database:
@@ -122,6 +319,9 @@ npx prisma migrate dev --name init
 This creates tables in your Postgres database.
 
 ---
+
+<br>
+<br>
 
 ## Step 7: Use Prisma Client in Next.js
 
@@ -150,6 +350,9 @@ For performance, consider using a singleton pattern for Prisma in development ([
 
 ---
 
+<br>
+<br>
+
 ## Step 8: Store Secrets Securely
 
 - **Local Development:**  
@@ -164,6 +367,9 @@ For performance, consider using a singleton pattern for Prisma in development ([
 ```
 
 ---
+
+<br>
+<br>
 
 ## Step 9: Query the API from the Frontend
 
@@ -181,6 +387,9 @@ async function createUser(user) {
 ```
 
 ---
+
+<br>
+<br>
 
 ## Step 10: Deploying
 
@@ -214,11 +423,11 @@ async function createUser(user) {
 
 ---
 
----
+<br>
+<br>
+<br>
 
 # PostgreSQL Passwords and Environment Variables: Local and Production
-
----
 
 ## How to Find or Set Your Local Postgres Password
 
