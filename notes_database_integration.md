@@ -1,6 +1,6 @@
----
 # Step-by-Step: PostgreSQL + Prisma in Next.js
----
+
+<br>
 
 ## Step 1: Install PostgreSQL Locally
 
@@ -40,15 +40,11 @@ does the same thing
 | `start`         | Tells Homebrew to launch the service and keep it running                        |
 | `postgresql`    | Specifies the service you want to manage (here: the PostgreSQL database server) |
 
----
-
 ### **Why/When to Use It?**
 
 - **After installing PostgreSQL via Homebrew**, you need to start the server before you can use it.
 - **If you restart your Mac**, this command ensures PostgreSQL starts up automatically.
 - You only need to run this once (unless you stop or restart the service).
-
----
 
 ### **Related Commands**
 
@@ -58,10 +54,11 @@ does the same thing
 | `brew services restart postgresql` | Restarts the PostgreSQL service        |
 | `brew services list`               | Shows all services managed by Homebrew |
 
----
+- **Summary:**  
+  `brew services start postgresql` ensures your PostgreSQL server is running in the background on your Mac, ready for your apps to connect to.
 
-**Summary:**  
-`brew services start postgresql` ensures your PostgreSQL server is running in the background on your Mac, ready for your apps to connect to.
+<br>
+<br>
 
 ## Step 1.2: Setup Postgres
 
@@ -124,42 +121,34 @@ You can create a database with your username (while connected as a superuser):
 ### **Alternative 3: Specify the Database you want to connect to**
 
 ```bash
-psql -d keto_track
+psql -d another_database
 ```
 
 ### **Summary Table**
 
-| What you want to do      | Command                                 |
-| :----------------------- | :-------------------------------------- |
-| Connect to default db    | `psql -d postgres`                      |
-| Connect as specific user | `psql -U yourMacOSusername -d postgres` |
-| Connect to your app db   | `psql -d keto_track`                    |
+| What you want to do                        | Command                                     |
+| :----------------------------------------- | :------------------------------------------ |
+| Connect to default db with system user     | `psql`                                      |
+| Connect to default db with system user     | `psql -d postgres`                          |
+| Connect to default db with system/any user | `psql -U whatever_user -d postgres`         |
+| Connect to specific db with system user    | `psql -d another_database`                  |
+| Connect to specific db with any user       | `psql -U whatever_user -d another_database` |
 
-### **Tip: Creating Your App Database**
+### **Create the `development` User (Role)**
 
-If you haven’t already, create your app database (from `psql -d postgres`):
-
-```sql
-CREATE DATABASE keto_track;
-```
-
-### **Create the `postgres` User (Role), optional**
-
-If you want to use `postgres` as your database user (recommended for tutorials and consistency):
-
-1. **Connect as the existing user** (your macOS username):
+1. **Connect with system user** (your macOS username):
 
    ```bash
    psql
    ```
 
-2. **Create the `postgres` role with superuser privileges:**
+2. **Create the `development` role with LOGIN CREATEDB privileges:**
 
    ```sql
-   CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD 'yourpassword';
+    CREATE ROLE development WITH LOGIN CREATEDB PASSWORD 'your_dev_password';
    ```
 
-   - Replace `'yourpassword'` with a secure password you choose.
+   - Replace `'your_dev_password'` with a secure password you choose.
 
 3. **Exit psql:**
 
@@ -167,80 +156,197 @@ If you want to use `postgres` as your database user (recommended for tutorials a
    \q
    ```
 
-4. **Now try connecting as `postgres`:**
+4. **Now try connecting as `development`:**
 
    ```bash
-   psql -U postgres
+   psql -U development
    ```
 
    - Enter the password you set above.
 
-### **Setup a password for your main user** TODO IMPORTANT
+### **Setup or change password for a user**
 
-# HEREEEEE TODO
+**1. Connect to PostgreSQL**
 
----
+Connect to the `postgres` default database as the user of which you want to change the password:
 
----
-
----
-
----
-
----
-
----
-
----
-
----
-
-# HEREEEEE
-
-## **Step 3: Alternative — Use Your Current User**
-
-If you don’t want to create a `postgres` user, just use your current user in your `.env` and Prisma configs:
-
-```
-DATABASE_URL="postgresql://yourMacOSusername@localhost:5432/keto_track"
-```
-
-<br>
-<br>
-
-## Step 2: Create Your Database
-
-Open a terminal and run:
+if you want to change the password of your default system user:
 
 ```bash
-psql -U postgres
+psql -d postgres
 ```
 
-- Default password is usually blank or `postgres` (set during installation).
+alternatively, you can specify the user:
 
-Create a database:
+```bash
+psql -U your_superuser -d postgres
+```
+
+**2. Change the Password**
+
+At the `psql` prompt, run:
 
 ```sql
-CREATE DATABASE nutrition_app;
+ALTER USER your_superuser WITH PASSWORD 'your_new_password';
 ```
 
-Exit with `\q`.
+- Replace `'your_new_password'` with your chosen password (use single quotes).
 
----
+**3. Exit psql**
+
+```sql
+\q
+```
+
+4. **Security Tips**
+
+- Choose a strong password.
+- Never share your password or commit it to version control.
+- Update your `.env` or any connection strings if you use this user for app connections.
+
+### Clarifying prompts
+
+- The prompt you see in `psql` is:
+
+```
+database_name=#
+```
+
+where `database_name` is the name of the database you are currently connected to.
+
+**Connection Scenarios**
+
+| Command                              | User             | Database         | Prompt shown       |
+| :----------------------------------- | :--------------- | :--------------- | :----------------- |
+| `psql -d postgres`                   | your system user | `postgres`       | `postgres=#`       |
+| `psql -U my_system_user -d postgres` | `my_system_user` | `postgres`       | `postgres=#`       |
+| `psql`                               | your system user | your system user | `my_system_user=#` |
+
+- If you don’t specify a database, `psql` tries to connect to a database **with the same name as your user**.
+- If you don’t specify a user, `psql` uses your **system username**.
+
+**Quick Reference Table**
+
+| What you type                        | User used        | Database used    | Prompt             |
+| :----------------------------------- | :--------------- | :--------------- | :----------------- |
+| `psql`                               | `my_system_user` | `my_system_user` | `my_system_user=#` |
+| `psql -d postgres`                   | `my_system_user` | `postgres`       | `postgres=#`       |
+| `psql -U my_system_user -d postgres` | `my_system_user` | `postgres`       | `postgres=#`       |
+| `psql -U someuser -d mydb`           | `someuser`       | `mydb`           | `mydb=#`           |
+
+**Summary**
+
+- The **user** is determined by `-U` or your system username.
+- The **database** is determined by `-d` or your system username.
+- The **prompt** shows the name of the database you’re connected to.
+
+If you connect to PostgreSQL with:
+
+```bash
+psql -d postgres
+```
+
+or
+
+```bash
+psql -U my_system_user -d postgres
+```
+
+in the console you see:
+
+```sql
+postgres=#
+```
+
+Instead if you connect to PostgreSQL with
+
+```bash
+psql
+```
+
+in the console you see:
+
+```sql
+elisabattistoni=#
+```
+
+**You are logging in as `my_system_user` in both cases, but the database you connect to changes depending on the command.**
 
 <br>
 <br>
 
-## Step 3: Add Prisma to Your Next.js Project
+## Step 2: Create and connect to keto_track database with development user
 
-In your Next.js app folder:
+IMPORTANT: you should create the `keto_track` database with the 'development' user, not with the system user. In this way, the owner of the `keto_track` database will be 'development' and not the system user.
+
+1. Create connection:
+
+```bash
+psql -U development -d postgres
+```
+
+2. Create database:
+
+```sql
+CREATE DATABASE keto_track;
+```
+
+3. Exit:
+
+```sql
+\q
+```
+
+4. Connect to the keto_track database with the development user:
+
+```bash
+psql -U development -d keto_track
+```
+
+When you are inside psql, if you want to check with which user you have established the connection to the database, i.e. the **current connected user**:
+
+```sql
+SELECT current_user;
+```
+
+or simply:
+
+```sql
+SELECT user;
+```
+
+<br>
+<br>
+
+## Step 3: add data to the keto_track database
+
+You can add data in several ways. In this case, I am using the GUI TablePlus.
+
+1. Open TablePlus and connect to the `keto_track` database as the `development` user
+
+- Click on "Create connection"
+- choose PostgreSQL (double-click)
+- enter all the details of the database you want to connect to
+
+2. Create the table, see TablePlus docs https://docs.tableplus.com/gui-tools/import-and-export
+
+<br>
+<br>
+
+## Step 4: Set up Prisma in the Next.js 15 project
+
+https://www.prisma.io/docs/guides/nextjs
+
+### **Step 1: Install Prisma**
+
+In your Next.js app root directory, run:
 
 ```bash
 npm install @prisma/client
 npm install prisma --save-dev
 ```
 
-Initialize Prisma:
+### **Step 2: Initialize Prisma**
 
 ```bash
 npx prisma init
@@ -248,78 +354,233 @@ npx prisma init
 
 This creates:
 
-- `prisma/schema.prisma` — your database models/config
-- `.env` — for secrets and DB connection
+- `prisma/schema.prisma` (your Prisma schema)
+- `.env` (for environment variables)
 
----
+IMPORTANT in prisma/scheme.prisma remove:
+`output   = "../lib/generated/prisma"`
+because this line tells Prisma to generate the client in ⁠lib/generated/prisma instead of the default location.
 
-<br>
-<br>
-
-## Step 4: Configure Database Connection
-
-Open the generated `.env` file and set the connection string:
-
-```
-DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/nutrition_app"
-```
-
-- Replace `YOUR_PASSWORD` with your actual Postgres password.
-- Never commit this file with real secrets to GitHub!
-
----
-
-<br>
-<br>
-
-## Step 5: Define Your Data Models
-
-Edit `prisma/schema.prisma`:
-
-```prisma
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  name  String
-  // Add other fields as needed
-}
-
-model NutritionValue {
-  id       Int    @id @default(autoincrement())
-  user     User   @relation(fields: [userId], references: [id])
-  userId   Int
-  calories Int
-  protein  Int
-  // Add other fields as needed
-}
-```
-
----
-
-<br>
-<br>
-
-## Step 6: Run Migrations
-
-Apply your schema to the database:
+This command outputs the following:
 
 ```bash
-npx prisma migrate dev --name init
+Fetching latest updates for this subcommand...
+
+✔ Your Prisma schema was created at prisma/schema.prisma
+  You can now open it in your favorite editor.
+
+warn You already have a .gitignore file. Don't forget to add `.env` in it to not commit any private information.
+
+Next steps:
+1. Run prisma dev to start a local Prisma Postgres server.
+2. Define models in the schema.prisma file.
+3. Run prisma migrate dev to migrate your local Prisma Postgres database.
+4. Tip: Explore how you can extend the ORM with scalable connection pooling, global caching, and a managed serverless Postgres database. Read: https://pris.ly/cli/beyond-orm
+
+More information in our documentation:
+https://pris.ly/d/getting-started
 ```
 
-This creates tables in your Postgres database.
+### **Step 3: Configure the Database Connection**
+
+Edit the `.env` file:
+
+```
+DATABASE_URL="postgresql://your_username:your_dev_password@localhost:5432/keto_track"
+```
+
+- Replace `development` and `your_dev_password` with your actual PostgreSQL username and password.
+
+### **Step 4: Introspect Your Existing Database**
+
+IMPORTANT before letting Prisma generate the model, you should know that (I tried to pull the vegetables table but got a warning):
+
+Prisma requires every table/model to have a unique identifier—usually a primary key column (e.g., `id SERIAL PRIMARY KEY`).  
+Your `vegetables` table does **not** have a primary key, so Prisma marks it with `@@ignore` and does **not** generate code to access it.
+Prisma Client needs a way to uniquely identify each row, for operations like `findUnique`, `update`, `delete`, etc.  
+Without a primary key, it can’t do this safely.
+
+**How to Fix: Add a Primary Key to Your Table**
+Add an `id` column (integer, auto-incrementing, primary key) to your `vegetables` table: in psql or TablePlus, run:
+
+```bash
+psql -U development -d keto_track
+```
+
+```sql
+ALTER TABLE vegetables ADD COLUMN id SERIAL PRIMARY KEY;
+```
+
+- `SERIAL` makes an auto-incrementing integer column.
+- `PRIMARY KEY` ensures uniqueness.
+
+```sql
+\q
+```
+
+After adding the primary key, you can run the following command to let Prisma generate models from them:
+
+```bash
+npx prisma db pull
+```
+
+Now your `prisma/schema.prisma` should look like:
+
+```prisma
+model vegetables {
+  id                                 Int     @id @default(autoincrement())
+  name_eng                           String?
+  name_ita                           String?
+  total_carbs_g                      Float?
+  net_carbs_g                        Float?
+  fiber_g                            Float?
+  proteins_g                         Float?
+  fats_g                             Float?
+  vitamin_c_mg                       Int?
+  potassium_mg                       Int?
+  calcium_mg                         Int?
+  magnesium_mg                       Int?
+  confidence_accuracy_macronutrients String?
+}
+```
+
+This updates `prisma/schema.prisma` with models representing your current database structure, including `vegetables`.
+
+If in this file you see an @@ignore, it means that there is no primary key. If you want to start fresh after adding the primary key to the table:
+
+```bash
+rm -rf prisma
+npx prisma init
+npx prisma db pull
+```
+
+### **Step 5: Generate the Prisma Client**
+
+```bash
+npx prisma generate
+```
+
+You can inspect your data with Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+### **Step 6: Set up Prisma Client & connect it to your db**
+
+Create a `lib/prisma.ts` file:
+
+```ts
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: ['query'], // Optional: logs all queries to console
+  });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+```
+
+### **Step 7: Create an API Route to Fetch Data**
+
+Create the file: `app/api/vegetables/route.ts`
+
+```ts
+// app/api/vegetables/route.ts
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+export async function GET() {
+  // Fetch all vegetables from the database
+  const vegetables = await prisma.vegetables.findMany();
+  return NextResponse.json(vegetables);
+}
+```
+
+**Note:**  
+If your table is named `vegetables`, Prisma model will likely be `Vegetables` (capitalized).  
+The generated client will use the plural, i.e., `prisma.vegetables.findMany()`.
+
+**You need an API route if:**
+
+- You want to fetch data **client-side** (e.g., with `fetch()` inside a React component or with SWR/React Query).
+- You want to expose your data to the browser or to external clients.
+- You want a clear separation between frontend and backend logic.
+
+Example of fetching data in a Client Component:
+
+```tsx
+// app/vegetables/page.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+
+export default function VegetablesPage() {
+  const [vegetables, setVegetables] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/vegetables')
+      .then((res) => res.json())
+      .then((data) => setVegetables(data));
+  }, []);
+
+  return (
+    <div>
+      <h1>Vegetables</h1>
+      <ul>
+        {vegetables.map((veg: any) => (
+          <li key={veg.id}>
+            {veg.name} {/* Adjust property names based on your table */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**You do NOT need an API route if:**
+
+- You are fetching data **server-side** (in a Next.js Server Component or in `getServerSideProps`/`getStaticProps`).
+- You are using Prisma **directly** in your React Server Component or page file.
+
+Example of fetching data in a Server Component:
+
+```tsx
+// app/vegetables/page.tsx (Server Component)
+import { prisma } from '@/lib/prisma';
+
+export default async function VegetablesPage() {
+  const vegetables = await prisma.vegetables.findMany();
+  return (
+    <ul>
+      {vegetables.map((veg) => (
+        <li key={veg.id}>{veg.name_eng}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**Best Practice**
+
+- **For server-side rendering (SSR) or static site generation (SSG):**  
+  Use Prisma directly in Server Components or data fetching functions.
+- **For client-side fetching, or if you want an API for other clients:**  
+  Create an API route.
+
+# HEREEEEEEEE ALL GOOD
 
 ---
 
+---
+
+<br>
+<br>
+<br>
 <br>
 <br>
 
