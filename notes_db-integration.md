@@ -844,3 +844,7 @@ It is a **special format used by Prisma Accelerate** (or sometimes by cloud data
 
 **If you want to use standard tools (psql, TablePlus), stick to the classic URL.  
 If you want Prisma’s advanced features (Accelerate/Data Proxy), use the special URL in your Prisma `.env`.**
+
+ok, let's recap. I am using Nextjs 15 with Mantine v8, using Prisma v6 to interface the Next app with the PostgreSQL database. I will use Next Auth (that now has become "Auth"??).
+I want to properly initialize in the database the tables that I will need for the users, authentication and so on. Consider that it will be a Nextjs (and in the future mobile) app that will serve as a food diary to track the foods eaten and that will calculate automatically the macronutrients (users will choose the foods based on the database entries, which will contain many foods with their nutritional values) on each meal.
+I want to create a bash script to automatize the creation of these information
