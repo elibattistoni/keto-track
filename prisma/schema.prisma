@@ -8,17 +8,13 @@ datasource db {
 }
 
 model vegetables {
-  name_eng                           String?
-  name_ita                           String?
-  total_carbs_g                      Float?
-  net_carbs_g                        Float?
-  fiber_g                            Float?
-  proteins_g                         Float?
-  fats_g                             Float?
-  vitamin_c_mg                       Int?
-  potassium_mg                       Int?
-  calcium_mg                         Int?
-  magnesium_mg                       Int?
-  confidence_accuracy_macronutrients String?
-  id                                 Int     @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
+  name_eng      String?
+  name_ita      String?
+  total_carbs_g Float?
+  net_carbs_g   Float?
+  fiber_g       Float?
+  proteins_g    Float?
+  fats_g        Float?
+  accuracy      Float?
 }

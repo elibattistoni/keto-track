@@ -484,7 +484,7 @@ export const prisma =
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 ```
 
-### **Step 7: Create an API Route to Fetch Data**
+### **Step 7: Create an API route (in Pages Router) aka Route Handlers (in App Router) to Fetch Data**
 
 Create the file: `app/api/vegetables/route.ts`
 
@@ -504,7 +504,7 @@ export async function GET() {
 If your table is named `vegetables`, Prisma model will likely be `Vegetables` (capitalized).  
 The generated client will use the plural, i.e., `prisma.vegetables.findMany()`.
 
-**You need an API route if:**
+**You need an API route (in Pages Router) aka Route Handlers (in App Router) if:**
 
 - You want to fetch data **client-side** (e.g., with `fetch()` inside a React component or with SWR/React Query).
 - You want to expose your data to the browser or to external clients.
@@ -542,7 +542,7 @@ export default function VegetablesPage() {
 }
 ```
 
-**You do NOT need an API route if:**
+**You do NOT need an API route (in Pages Router) aka Route Handlers (in App Router) if:**
 
 - You are fetching data **server-side** (in a Next.js Server Component or in `getServerSideProps`/`getStaticProps`).
 - You are using Prisma **directly** in your React Server Component or page file.
@@ -570,7 +570,7 @@ export default async function VegetablesPage() {
 - **For server-side rendering (SSR) or static site generation (SSG):**  
   Use Prisma directly in Server Components or data fetching functions.
 - **For client-side fetching, or if you want an API for other clients:**  
-  Create an API route.
+  Create an API route (in Pages Router) aka Route Handlers (in App Router).
 
 <br>
 <br>
@@ -617,7 +617,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 **In short:**  
 The singleton pattern for PrismaClient in Next.js apps (especially in development) is a best practice to avoid multiple instances and database connection errors.
 
-Example of POST request in in your API route (e.g., `app/api/users/route.ts`):
+Example of POST request in in your API route (in Pages Router) aka Route Handlers (in App Router) (e.g., `app/api/users/route.ts`):
 
 ```ts
 import { NextRequest, NextResponse } from 'next/server';
@@ -685,3 +685,162 @@ DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/nutrition_app"
 
 - **Never commit your `.env` file** with passwords to version control.
 - **Always use environment variables** for secrets in both local and production environments.
+
+# A note about the DATABASE_URL
+
+```
+DATABASE_URL="postgresql://your_username:your_dev_password@localhost:5432/keto_track"
+```
+
+---
+
+## **Decomposition of the URL**
+
+| Part              | Example value       | What it means                                                               |
+| :---------------- | :------------------ | :-------------------------------------------------------------------------- |
+| **Scheme**        | `postgresql://`     | Tells Prisma (or any client) to use PostgreSQL                              |
+| **Username**      | `your_username`     | The database user account to connect as                                     |
+| **Password**      | `your_dev_password` | The password for that database user                                         |
+| **Host**          | `localhost`         | The server where PostgreSQL is running (`localhost` means your own machine) |
+| **Port**          | `5432`              | The network port PostgreSQL listens on (default is 5432)                    |
+| **Database name** | `keto_track`        | The name of the specific database to connect to                             |
+
+---
+
+### **Visual Breakdown**
+
+```
+postgresql://your_username:your_dev_password@localhost:5432/keto_track
+    |          |               |                |     |         |
+  scheme   username        password        host  port   database
+```
+
+---
+
+### **What Each Part Does**
+
+- **postgresql://**  
+  Protocol/scheme — tells the client which type of database to connect to.
+
+- **your_username:your_dev_password@**  
+  Authentication — credentials used to log in to the database server.
+
+- **localhost**  
+  Host — the address of the machine where PostgreSQL is running.
+- `localhost` means "this computer."
+- If your DB is on another server, replace with its IP or hostname.
+
+- **5432**  
+  Port — the network port PostgreSQL listens on.
+- Default is `5432`, but it can be changed in your PostgreSQL config.
+
+- **keto_track**  
+  Database — the specific database on the server you want to use.
+
+---
+
+### **General Pattern**
+
+```
+postgresql://<username>:<password>@<host>:<port>/<database>
+```
+
+---
+
+## **Example with Real Values**
+
+Suppose:
+
+- Username: `development`
+- Password: `mypassword`
+- Host: `localhost`
+- Port: `5432`
+- Database: `keto_track`
+
+The URL would be:
+
+```
+postgresql://development:mypassword@localhost:5432/keto_track
+```
+
+---
+
+## **Where is this used?**
+
+- In your `.env` file for Prisma (`DATABASE_URL=...`)
+- In any tool or library that connects to your PostgreSQL database
+
+---
+
+However, the DATABASE_URL that is automatically generated by Prisma has a different structure:
+
+```
+DATABASE_URL="prisma+postgres://localhost:51213/?api_key=..."
+```
+
+is **not a standard PostgreSQL connection string**.  
+It is a **special format used by Prisma Accelerate** (or sometimes by cloud database proxies/services) for advanced features like connection pooling, edge deployments, or data proxying.
+
+---
+
+## **What Does Each Part Mean?**
+
+| Part                | Example Value        | What it Means                                                                                  |
+| :------------------ | :------------------- | :--------------------------------------------------------------------------------------------- |
+| **Scheme**          | `prisma+postgres://` | Tells Prisma to use its own proxy/data layer, not direct DB connection                         |
+| **Host**            | `localhost`          | The address of the Prisma Data Proxy/Accelerate endpoint (can be a remote server or localhost) |
+| **Port**            | `51213`              | The port where the proxy/accelerate endpoint is listening                                      |
+| **Query parameter** | `?api_key=...`       | API key to authenticate with the proxy/accelerate endpoint                                     |
+
+---
+
+## **Why Does Prisma Generate This?**
+
+- **If you use [Prisma Accelerate](https://www.prisma.io/docs/accelerate) or the Prisma Data Proxy,** Prisma will generate a URL like this for you.
+- This URL tells Prisma Client to connect **not directly to PostgreSQL**, but to a managed proxy that handles connections, pooling, caching, and authentication for you.
+- The `prisma+postgres://` scheme is recognized by Prisma Client, but **not by other tools** (like `psql`).
+
+---
+
+## **When Do You See This?**
+
+- When you create a project using Prisma Accelerate or Data Proxy.
+- When you copy the connection string from the Prisma Cloud dashboard.
+- Sometimes when using cloud development environments or managed Prisma services.
+
+---
+
+## **Can You Use This with psql or TablePlus?**
+
+**No.**
+
+- This URL is **only for Prisma Client**.
+- Tools like `psql`, TablePlus, or DBeaver **require a standard PostgreSQL URL** (e.g., `postgresql://user:password@host:port/dbname`).
+
+---
+
+## **Should You Use This Locally?**
+
+- **If you are not using Prisma Accelerate or Data Proxy,** use the standard PostgreSQL URL.
+- Use the `prisma+postgres://...` URL **only** if you have set up Accelerate/Data Proxy and want Prisma to connect through it.
+
+---
+
+## **Summary Table**
+
+| URL Type                     | Use Case                         | Example Format                             |
+| :--------------------------- | :------------------------------- | :----------------------------------------- |
+| Standard PostgreSQL          | Local/dev/most production setups | `postgresql://user:pass@host:port/dbname`  |
+| Prisma Accelerate/Data Proxy | Prisma-managed cloud features    | `prisma+postgres://host:port/?api_key=...` |
+
+---
+
+## **In Practice**
+
+- For **local development**, use the standard PostgreSQL URL.
+- For **Prisma Accelerate/Data Proxy**, use the generated `prisma+postgres://...` URL **only in Prisma Client**.
+
+---
+
+**If you want to use standard tools (psql, TablePlus), stick to the classic URL.  
+If you want Prisma’s advanced features (Accelerate/Data Proxy), use the special URL in your Prisma `.env`.**
