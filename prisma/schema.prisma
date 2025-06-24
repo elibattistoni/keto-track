@@ -7,14 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model vegetables {
-  id            Int     @id @default(autoincrement())
-  name_eng      String?
-  name_ita      String?
-  total_carbs_g Float?
-  net_carbs_g   Float?
-  fiber_g       Float?
-  proteins_g    Float?
-  fats_g        Float?
-  accuracy      Float?
+model food {
+  id                Int     @id @default(autoincrement())
+  name_eng          String?
+  name_ita          String?
+  food_category_eng String?
+  food_category_ita String?
+  calories_kcal     Float?
+  total_carbs_g     Float?
+  net_carbs_g       Float?
+  fiber_g           Float?
+  proteins_g        Float?
+  fats_g            Float?
+  accuracy          Float?
 }

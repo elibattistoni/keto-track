@@ -2,7 +2,7 @@ import { Welcome } from '@/components';
 import { prisma } from '@/lib/prisma';
 
 export default async function HomePage() {
-  const vegetables = await prisma.vegetables.findMany();
-  console.log('Fetched vegetables:', vegetables);
+  const food = await prisma.food.findMany();
+  // console.log('Fetched food:', food);
   return <Welcome />;
 }
