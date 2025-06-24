@@ -19,4 +19,7 @@ echo "Running 03_db-create-users-tables.sh ..."
 echo "Running 04_init-prisma.sh ..."
 "$SCRIPT_DIR/04_init-prisma.sh"
 
+echo "Running 05_db-add-mock.users.sh ..."
+"$SCRIPT_DIR/05_db-add-mock.users.sh"
+
 echo "All scripts executed successfully."

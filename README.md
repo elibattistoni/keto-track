@@ -35,3 +35,17 @@ This template comes with the following features:
 - `storybook` – starts storybook dev server
 - `storybook:build` – build production storybook bundle to `storybook-static`
 - `prettier:write` – formats all files with Prettier
+
+# Initialize the project: create the database, the data tables, and the Prisma connection
+
+In the terminal, from the root project folder, run:
+
+```bash
+chmod +x ./init/script/00_run-all.sh
+```
+
+and then
+
+```bash
+./init/script/00_run-all.sh
+```

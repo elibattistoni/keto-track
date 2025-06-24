@@ -18,25 +18,10 @@ else
   exit 1
 fi
 
-# Check required variables
-if [ -z "${DB_USER:-}" ] || [ -z "${DB_PASSWORD:-}" ] || [ -z "${DB_NAME:-}" ]; then
-  echo "Please set DB_USER, DB_PASSWORD, and DB_NAME in your .env file."
-  exit 1
-fi
-
-DB_HOST="localhost"
-DB_PORT="5432"
-ADMIN_DB="postgres"
+# Allow override of host/port, or use defaults
+DB_HOST="${DB_HOST:-localhost}"
+DB_PORT="${DB_PORT:-5432}"
 export PGPASSWORD="$DB_PASSWORD"
-
-# Ensure database exists
-DB_EXISTS=$(psql -h "$DB_HOST" -U "$DB_USER" -p "$DB_PORT" -d "$ADMIN_DB" -tc "SELECT 1 FROM pg_database WHERE datname = '$DB_NAME';" | tr -d '[:space:]')
-if [ "$DB_EXISTS" != "1" ]; then
-  psql -h "$DB_HOST" -U "$DB_USER" -p "$DB_PORT" -d "$ADMIN_DB" -c "CREATE DATABASE \"$DB_NAME\";"
-  echo "Database $DB_NAME was created."
-else
-  echo "Database $DB_NAME already exists."
-fi
 
 # Remove all the tables (clean the db)
 echo "Dropping all tables in database $DB_NAME ..."
@@ -57,7 +42,7 @@ echo "All tables dropped."
 
 # Populate with new data
 csvfile="init/data/foods.csv"
-tablename="food"
+tablename="foods"
 
 echo "Populating table '$tablename' in database $DB_NAME from $csvfile ..."
 

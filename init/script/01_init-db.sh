@@ -17,10 +17,9 @@ if [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ]; then
   exit 1
 fi
 
-# Defaults
-DB_HOST="localhost"
-DB_PORT="5432"
-
+# Allow override of host/port, or use defaults
+DB_HOST="${DB_HOST:-localhost}"
+DB_PORT="${DB_PORT:-5432}"
 # Export password for psql
 export PGPASSWORD="$DB_PASSWORD"
 
