@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model accounts {
+  id                  String  @id
+  user_id             String
+  type                String
+  provider            String
+  provider_account_id String
+  refresh_token       String?
+  access_token        String?
+  expires_at          Int?
+  token_type          String?
+  scope               String?
+  id_token            String?
+  session_state       String?
+  users               users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([provider, provider_account_id])
+}
+
+model foods {
+  id                Int          @id @default(autoincrement())
+  name_eng          String?
+  name_ita          String?
+  food_category_eng String?
+  food_category_ita String?
+  calories_kcal     Float?
+  total_carbs_g     Float?
+  net_carbs_g       Float?
+  fiber_g           Float?
+  proteins_g        Float?
+  fats_g            Float?
+  accuracy          Float?
+  meal_foods        meal_foods[]
+}
+
+model meal_foods {
+  meal_id    Int
+  food_id    Int
+  quantity_g Float
+  foods      foods @relation(fields: [food_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  meals      meals @relation(fields: [meal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([meal_id, food_id])
+}
+
+model meals {
+  id         Int          @id @default(autoincrement())
+  user_id    String
+  meal_time  DateTime     @db.Timestamp(6)
+  notes      String?
+  meal_foods meal_foods[]
+  users      users        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model sessions {
+  id            String   @id
+  session_token String   @unique
+  user_id       String
+  expires       DateTime @db.Timestamp(6)
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model users {
+  id             String     @id
+  name           String?
+  email          String?    @unique
+  email_verified DateTime?  @db.Timestamp(6)
+  image          String?
+  password       String?
+  role           user_role  @default(starter)
+  accounts       accounts[]
+  meals          meals[]
+  sessions       sessions[]
+}
+
+model verification_token {
+  identifier String
+  token      String   @unique
+  expires    DateTime @db.Timestamp(6)
+
+  @@id([identifier, token])
+}
+
+enum user_role {
+  admin
+  starter
+  premium
+}
