@@ -1,30 +1,41 @@
+// API router for mobile/external user registration
+// ⚠️ TODO ELISA THIS IS NOT BEING USED AT THE MOMENT (needed for mobile/external app)
+// ✅ TESTED WITH POSTMAN
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcrypt';
-import { prisma } from '@/lib/prisma';
+import { registerUserLogic } from '@/lib/auth/register';
+import { messages } from '@/lib/messages';
+
+/*
+	•	The API always returns both ⁠success and ⁠error keys, matching the shared logic in registerUserLogic
+  •	On validation or business logic errors, it returns ⁠{ success: null, error: { ... } } with HTTP 400.
+  •	On system errors (e.g., server crash), it returns ⁠{ success: null, error: { general: ... } } with HTTP 500.
+  •	On success, it returns ⁠{ success: 'Registration successful! You can now log in.', error: null } with HTTP 200.
+*/
 
 export async function POST(req: NextRequest) {
-  const { email, password, name } = await req.json();
+  try {
+    const { name = '', email = '', password = '', confirmPassword = '' } = await req.json();
 
-  if (!email || !password) {
-    return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
+    const result = await registerUserLogic({ name, email, password, confirmPassword });
+
+    return NextResponse.json(
+      {
+        success: result.success,
+        error: result.error,
+      },
+      {
+        status: result.error ? 400 : 200,
+      }
+    );
+  } catch {
+    return NextResponse.json(
+      {
+        success: null,
+        error: { general: messages.registration.failed },
+      },
+      {
+        status: 500,
+      }
+    );
   }
-
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) {
-    return NextResponse.json({ error: 'Email already registered.' }, { status: 400 });
-  }
-
-  const hashed = await bcrypt.hash(password, 10);
-
-  await prisma.user.create({
-    data: {
-      id:'',
-      email,
-      password: hashed,
-      name,
-      // role: 'STARTER' // default
-    },
-  });
-
-  return NextResponse.json({ success: true });
 }

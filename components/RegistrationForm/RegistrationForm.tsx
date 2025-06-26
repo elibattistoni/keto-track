@@ -4,19 +4,16 @@ import { useActionState, useEffect, useState } from 'react';
 import { Alert, Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { registerUser } from '@/app/register/actions';
-
-type FormFields = {
-  name: string;
-  password: string;
-  confirmPassword: string;
-  email: string;
-};
+import { FormFields } from '@/types/registration';
 
 export function RegistrationForm() {
-  const [state, formAction] = useActionState(registerUser, { success: null, error: null });
+  const [state, formAction, isPending] = useActionState(registerUser, {
+    success: null,
+    error: null,
+  });
   const [showMessage, setShowMessage] = useState<null | 'success' | 'error'>(null);
 
-  const form = useForm({
+  const form = useForm<FormFields>({
     initialValues: {
       name: '',
       email: '',
@@ -33,10 +30,11 @@ export function RegistrationForm() {
     onSubmitPreventDefault: 'validation-failed',
   });
 
+  // this keeps in sync the state errors (from the server action) with the form errors (from Mantine useForm)
   useEffect(() => {
     console.log('USE EFFECT TRIGGERED', state.error, form.errors);
 
-    if (state.error) {
+    if (state?.error) {
       form.setErrors(state.error);
     }
 
@@ -49,14 +47,18 @@ export function RegistrationForm() {
     }
   }, [state]);
 
-  // Handler to clear error when field changes
+  // issue that this solves:
+  // if you get back an error from the server action, if the user starts typing, the error is not cleared immediately
+  // which is what we want for better UX
+  // so we clear the error for that field when the user starts typing
+  // this is a workaround, as Mantine's useForm does not provide a way to clear errors on field change directly.
   const handleFieldChange =
     (field: keyof FormFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      // Update form value
+      // update form value (needed because with the onChange handler, Mantine's useForm does not update the value automatically)
       form.setFieldValue(field, event.currentTarget.value);
-      // Clear error for that field
+      // clear error for that field
       form.clearFieldError(field);
-
+      // remove the general error/message if the user starts typing
       if (showMessage === 'error' || showMessage === 'success') {
         setShowMessage(null);
       }
@@ -68,6 +70,8 @@ export function RegistrationForm() {
         <Stack>
           <Title order={2}>Register</Title>
           <Text size="sm">Create a new account</Text>
+          {/* action triggers the server action, which performs server side validation */}
+          {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
           <form action={formAction} onSubmit={form.onSubmit(() => {})}>
             <Stack>
               <TextInput
@@ -78,7 +82,6 @@ export function RegistrationForm() {
                 name="name"
                 type="text"
                 onChange={handleFieldChange('name')}
-                // error={state.error?.name || form.errors.name}
               />
               <TextInput
                 label="Email"
@@ -88,7 +91,6 @@ export function RegistrationForm() {
                 name="email"
                 type="email"
                 onChange={handleFieldChange('email')}
-                // error={state.error?.email || form.errors.email}
               />
               <PasswordInput
                 label="Password"
@@ -97,7 +99,6 @@ export function RegistrationForm() {
                 withAsterisk
                 name="password"
                 onChange={handleFieldChange('password')}
-                // error={state.error?.password || form.errors.password}
               />
               <PasswordInput
                 label="Confirm Password"
@@ -106,7 +107,6 @@ export function RegistrationForm() {
                 withAsterisk
                 name="confirmPassword"
                 onChange={handleFieldChange('confirmPassword')}
-                // error={state.error?.confirmPassword || form.errors.confirmPassword}
               />
 
               {showMessage && (

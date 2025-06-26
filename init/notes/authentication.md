@@ -1,42 +1,20 @@
-Absolutely! Here’s a **clear, up-to-date guide** for implementing authentication in your **Next.js 15 (App Router) + TypeScript + next-auth + Prisma 6 + Mantine 8** stack.
+**Step-by-step authentication setup** for your KetoTrack project using:
+
+- Next.js 15 (App Router, TypeScript)
+- Prisma (with PostgreSQL)
+- next-auth (Auth.js) with Prisma Adapter
+- Mantine 8 (UI)
+- Role-based access (admin, starter, premium)
+- Secure password storage (bcrypt)
+- Server-side and client-side session handling
+
+You can use this as a README section or developer setup guide.
 
 ---
 
-# **1. High-Level Guide**
+# 🛡️ Authentication Setup (Next.js + Prisma + next-auth + Mantine)
 
-**What you’ll do:**
-
-1. **Install Dependencies:**  
-   Add `next-auth`, `@next-auth/prisma-adapter`, `bcrypt`, and types.
-
-2. **Project Structure:**
-   - Auth API route: `/app/api/auth/[...nextauth]/route.ts`
-   - Registration API route: `/app/api/register/route.ts` (for custom registration)
-   - Forms: Mantine-based register/login forms in `/components`
-   - Prisma client singleton in `/lib/prisma.ts`
-
-3. **Database & Prisma:**
-   - User model includes password hash and role.
-   - Use Prisma 6 migrations.
-
-4. **Registration Flow:**
-   - Form submits to `/api/register` (server action or API route)
-   - Password hashed with `bcrypt`, user saved via Prisma
-
-5. **Login Flow:**
-   - Form calls `signIn("credentials")` from next-auth
-   - next-auth validates password with `bcrypt`, creates session
-
-6. **Session & Authorization:**
-   - Use next-auth helpers to check session and user role in server components or route handlers
-
----
-
-# **2. Step-by-Step Guide**
-
----
-
-## **Step 1: Install Dependencies**
+## 1. Install Dependencies
 
 ```bash
 npm install next-auth @next-auth/prisma-adapter
@@ -44,7 +22,7 @@ npm install next-auth @next-auth/prisma-adapter
 
 ---
 
-## **Step 2: Check Prisma Schema**
+## 2. Check Prisma Schema
 
 **In `prisma/schema.prisma`:** check the presence of the correct models
 
@@ -74,11 +52,11 @@ model User {
 
 ---
 
-## **Step 3: Check Prisma Client Singleton**
+## 3. Prisma Client Singleton
 
-**In `/lib/prisma.ts`:**
+Create `/lib/prisma.ts`:
 
-```ts
+```typescript
 import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -90,280 +68,276 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 ---
 
-## **Step 4: next-auth API Route**
-
-**In `/app/api/auth/[...nextauth]/route.ts`:**
-
-```ts
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import bcrypt from 'bcrypt';
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { prisma } from '@/lib/prisma';
-
-const handler = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email', placeholder: 'you@example.com' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-        if (!user || !user.password) return null;
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
-      },
-    }),
-  ],
-  session: {
-    strategy: 'jwt',
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.role = token.role;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: '/login',
-  },
-});
-
-export { handler as GET, handler as POST };
-```
-
----
-
-## **Step 5: Registration API Route**
-
-**In `/app/api/register/route.ts`:**
-
-```ts
-import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcrypt';
-import { prisma } from '@/lib/prisma';
-
-export async function POST(req: NextRequest) {
-  const { email, password, name } = await req.json();
-
-  if (!email || !password) {
-    return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
-  }
-
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) {
-    return NextResponse.json({ error: 'Email already registered.' }, { status: 400 });
-  }
-
-  const hashed = await bcrypt.hash(password, 10);
-
-  await prisma.user.create({
-    data: {
-      email,
-      password: hashed,
-      name,
-      // role: 'STARTER' // default
-    },
-  });
-
-  return NextResponse.json({ success: true });
-}
-```
-
----
-
-## **Step 6: Registration Form Integration**
+## 4. Registration Form (Mantine)
 
 - in `components/RegistrationForm/RegistrationForm.tsx`:
   - `useForm` (from Mantine) performs client-side validation
-  - `useFormState` is linked to the server action `registerUser` (in `app/register/actions.ts`) and calls this server action when the submit button is clicked; it also updates the UI with messages from the server action if there are any errors
+  - `useActionState` is linked to the server action `registerUser` (in `app/register/actions.ts`) and calls this server action when the submit button is clicked; it also updates the UI with messages from the server action if there are any errors
   - the form's `action` posts to the server action `registerUser` which does secure validation and DB logic
 
-```tsx
-'use client';
-
-import { useFormState } from 'react-dom';
-import { Alert, Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { registerUser } from '@/app/register/actions';
-
-export function RegistrationForm() {
-  // Integrate server state with useFormState
-  const [state, formAction] = useFormState(registerUser, {});
-
-  const form = useForm({
-    initialValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
-    validate: {
-      email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : 'Invalid email'),
-      password: (value) => (value.length >= 6 ? null : 'Password must be at least 6 characters'),
-      confirmPassword: (value, values) =>
-        value === values.password ? null : 'Passwords do not match',
-    },
-  });
-
-  return (
-    <Stack align="center" justify="center">
-      <Paper shadow="md" p="xl" withBorder style={{ minWidth: 320, maxWidth: 400 }}>
-        <Stack>
-          <Title order={2}>Register</Title>
-          <Text size="sm">Create a new account</Text>
-          <form
-            action={async (formData) => {
-              // Let server action handle everything
-              formAction(formData);
-            }}
-            // Optionally, you can add onSubmit validation here
-            onSubmit={form.onSubmit(() => {})}
-          >
-            <Stack>
-              <TextInput
-                label="Email"
-                placeholder="you@example.com"
-                {...form.getInputProps('email')}
-                required
-                name="email"
-                type="email"
-                autoComplete="email"
-              />
-              <PasswordInput
-                label="Password"
-                placeholder="Your password"
-                {...form.getInputProps('password')}
-                required
-                name="password"
-                autoComplete="new-password"
-              />
-              <PasswordInput
-                label="Confirm Password"
-                placeholder="Repeat your password"
-                {...form.getInputProps('confirmPassword')}
-                required
-                name="confirmPassword"
-                autoComplete="new-password"
-              />
-
-              {state?.error && (
-                <Alert color="red" variant="light">
-                  {state.error}
-                </Alert>
-              )}
-              {state?.success && (
-                <Alert color="green" variant="light">
-                  {state.success}
-                </Alert>
-              )}
-
-              <Button type="submit" fullWidth>
-                Register
-              </Button>
-            </Stack>
-          </form>
-        </Stack>
-      </Paper>
-    </Stack>
-  );
-}
-```
-
-A note about this:
+  A note about this:
 
 ```tsx
 <form
-  action={async (formData) => {
-    // Let server action handle everything
-    formAction(formData);
-  }}
-  // Optionally, you can add onSubmit validation here
+  action={formAction}
   onSubmit={form.onSubmit(() => {})}
 >
 ```
 
-This approach is needed if you use a combination of **Mantine’s `useForm`** (for client-side validation) and **React’s server actions** (`formAction` from `useFormState`).
+This approach is needed if you use a combination of **Mantine’s `useForm`** (for client-side validation) and **React’s server actions** (`formAction` from `useActionState`).
 
-- **1. The “Simple” Approach: `<form action={formAction}>`**
+- **`<form action={formAction}>`**
+- This is the function that actually calls the server action if validation passes.
   - This is the **default and recommended way** to use server actions in Next.js 15.
   - When you use `<form action={formAction}>`, the browser will submit the form and the server action will receive the form data.
   - **Downside:** If you want to run custom client-side validation (e.g., with Mantine’s `useForm`), you can’t easily intercept or prevent a submit with errors, because the native form submission happens immediately.
 
-- **2. The “Custom Handler” Approach:**
-
-```tsx
-<form
-  action={async (formData) => {
-    // Custom logic before calling the server action
-    formAction(formData);
-  }}
-  onSubmit={form.onSubmit(() => {})}
->
-```
-
-Here, you provide an async function to the `action` prop. **Why?**
-
-- This lets you intercept the submission, so you can:
-  - Run **client-side validation** with Mantine’s `form.onSubmit`.
-  - Optionally do something else (e.g., analytics, extra checks) before calling the server action.
-- You still call the server action (`formAction(formData)`) manually, so you get all the benefits of server-side logic, error handling, etc.
-
 - **`onSubmit={form.onSubmit(() => {})}`**
 - This is Mantine’s handler for client-side validation.
 - If validation fails, it prevents form submission.
-- **`action={async (formData) => { formAction(formData); }}`**
-- This is the function that actually calls the server action if validation passes.
 
 **This combination ensures:**
 
 - The form only submits if client-side validation passes.
-- The server action always receives valid data.
-- You can still use React’s server action features (like `useFormState`).
+- The server action always receives valid data (but it still performs a validation server-side).
 
-# ELISA TODO HERE
+Integrating the client-side and the server-side errors to be displayed correctly in the UI for best UX, was a little challenging!
 
 ---
 
-## **Step 7: Login Form Integration**
+## 5. Registration API Route (Route Handler)
 
-**In `/components/LoginForm.tsx`:**
+**`/app/api/register/route.ts`:**
 
-```tsx
-import { signIn } from 'next-auth/react';
+Question: for the registration (and also e.g. login), should I keep both a server action and an API route (route handler)?
 
-// ...other imports
+**Yes, you should keep (or create) the `/api/register/route.ts` API route if you want to support registration from a mobile app or any external client in the future.**
+
+Why?
+
+- **Server actions** are only accessible from within your Next.js web app—they are not exposed as HTTP endpoints that external clients (like a mobile app) can call.
+- **API routes** (`/api/register/route.ts`) are standard HTTP endpoints. They can be called from:
+- Your own Next.js app (via `fetch`)
+- Any mobile app (React Native, Flutter, etc.)
+- Other external services or tools
+
+### **Recommended Approach**
+
+- **For your web app:**  
+  Use a server action for registration to get all the benefits of the new Next.js 15 architecture (faster, more secure, direct integration with React forms).
+
+- **For your mobile app/external clients:**  
+  Keep `/api/register/route.ts` as a REST endpoint for registration.
+
+- **How to avoid code duplication?**  
+  Move the actual registration logic (e.g., validation, password hashing, Prisma call) into a shared function (e.g., `/lib/auth/register.ts`).  
+  Then call this function from both your server action and your API route.
+
+### **Example Structure**
+
+```
+/lib/auth/register.ts      <-- Shared registration logic
+/app/api/register/route.ts <-- API route for mobile/external
+/app/register/actions.ts   <-- Server action for internal web app registration
+```
+
+| Use Case            | Use API Route? | Use Server Action? |
+| :------------------ | :------------- | :----------------- |
+| Next.js web app     | Optional       | ✅ Recommended     |
+| Mobile app/external | ✅ Required    | ❌ Not possible    |
+
+### Test the API route with Postman
+
+1. Open Postman.
+2. Create a new POST request to ⁠http://localhost:3000/api/register.
+3. Set the Body to raw and JSON, and enter:
+   {
+   "name": "Test User",
+   "email": "testuser@example.com",
+   "password": "password123",
+   "confirmPassword": "password123"
+   }
+4. Click Send and check the response.
+
+<br>
+Your registration implementation is **very solid and aligns well with modern best practices** for a Next.js 15 + Prisma + next-auth stack. Here’s a detailed review of why your approach is good, and a few suggestions for further improvement if you want to go the extra mile.
+
+---
+
+### ✅ What’s Good About Your Registration Flow
+
+| Practice                          | Your Implementation                                                | Why it’s Good                      |
+| :-------------------------------- | :----------------------------------------------------------------- | :--------------------------------- |
+| **Separation of concerns**        | Registration is handled separately from authentication (next-auth) | Keeps code maintainable and clear  |
+| **Server-side validation**        | Uses Zod schema in `registerUserLogic`                             | Ensures only valid data is stored  |
+| **Client-side validation**        | Uses Mantine’s form validation                                     | Gives instant feedback to the user |
+| **Password hashing**              | Uses bcrypt before storing in DB                                   | Secure, industry standard          |
+| **No duplicate emails**           | Checks for existing user before creating                           | Prevents account collisions        |
+| **Shared logic**                  | `registerUserLogic` is reused between server action and API route  | DRY, easy to maintain              |
+| **API route for mobile/external** | `/api/register/route.ts`                                           | Enables future flexibility         |
+| **Good error handling**           | Returns structured errors for both validation and system errors    | UX and debugging friendly          |
+| **No sensitive data leak**        | No password or sensitive info sent to the client                   | Secure                             |
+
+---
+
+### ⭐ Suggestions for "Even Better" Practice
+
+These are optional, but can add polish or security:
+
+1. **Email Verification (optional for MVP):**
+   - Consider sending a verification email before activating the account.
+   - This prevents bots and ensures the user owns the email.
+
+2. **Rate Limiting / Throttling:**
+   - Prevent abuse by limiting registration attempts per IP/email.
+
+3. **Logging & Monitoring:**
+   - Log registration attempts, errors, and successes for security/audit purposes.
+
+4. **Auto-login after registration (optional):**
+   - You can programmatically sign in the user after successful registration for a smoother UX.
+   - Can be done by calling `signIn("credentials", ...)` after success.
+
+5. **Strong password policy:**
+   - Consider enforcing stronger password rules (e.g., numbers, symbols).
+
+6. **User feedback:**
+   - Consider adding loading states, success redirects, or onboarding steps after registration.
+
+7. **Role assignment:**
+   - If you want to support different roles (starter, premium, admin), assign the appropriate default role in your registration logic.
+
+---
+
+### 🚦 TL;DR
+
+- **Your registration flow is already best-practice, secure, and ready for production.**
+- **You’re using the right separation:** registration (sign-up) is your custom logic; authentication (sign-in/session) is next-auth’s job.
+- **You’re future-proofed** by also having an API route for mobile/external use.
+
+---
+
+## 6. next-auth API Route
+
+**`/app/api/auth/[...nextauth]/route.ts`**
+
+The `[...nextauth]` part means:  
+**“Handle all requests under `/api/auth/*` with this file.”**
+
+### What is the next-auth API Route?
+
+In Next.js (with App Router), **next-auth** (now called Auth.js) manages authentication via a special API route.  
+This route handles all authentication-related requests, such as:
+
+- Signing in and out
+- Session management
+- Callback handling (for OAuth or custom providers)
+- User registration (if you set it up)
+- Token and session callbacks
+
+- By default, next-auth does NOT provide a registration endpoint or UI.
+- Some social providers (like Google) will create a user on first sign-in, but for email/password, you must build the registration flow yourself (as you did).
+- If you want registration to go through next-auth, you’d need to customize its callbacks or use community solutions, but that’s not typical for email/password.
+
+How Does next-auth Use Your Registered Users?
+
+- When a user tries to sign in with email/password, next-auth (via your CredentialsProvider) looks up the user in the database.
+- If their credentials match (and the password is correctly hashed), next-auth creates a session for them.
+- So:
+  1. You create users (registration)
+  2. next-auth authenticates users (login/session)
+
+---
+
+### Why is this needed?
+
+- **Centralizes authentication logic:** All login, logout, and session activities are handled here.
+- **Enables multiple providers:** You can add Google, GitHub, and custom credential providers in one place.
+- **Session management:** Handles issuing and verifying JWT tokens or database sessions.
+- **Secure API:** Only this route knows how to validate passwords, issue sessions, and protect user data.
+
+Without this, you’d have to write (and maintain) all the authentication logic yourself—including password checks, session cookies, etc.
+
+---
+
+### How does it work in practice?
+
+- **User submits login form** → `/api/auth/callback/credentials` is called → hits this route.
+- **CredentialsProvider.authorize** runs: checks email/password, returns user if valid.
+- **Session is created** (JWT or DB, depending on config).
+- **Session and JWT callbacks**: Add custom info (like user role) to tokens and session objects.
+- **All session checks** (e.g., in `getServerSession`) look up info via this route.
+
+---
+
+### Why is this file so important?
+
+| Reason                       | Description                                                            |
+| :--------------------------- | :--------------------------------------------------------------------- |
+| Centralizes authentication   | All auth logic (login, session, providers) lives here                  |
+| Secure credential validation | Ensures only hashed passwords are checked, never exposes raw passwords |
+| Extensible                   | Add/remove providers (Google, GitHub, etc.) in one place               |
+| Session customization        | Add custom fields (like `role`) to session and JWTs                    |
+| Next.js integration          | Works with both API routes and App Router                              |
+
+---
+
+### Typical lifecycle
+
+1. **User logs in** → Hits this route → Credentials are checked → Session is created.
+2. **Any page needing auth** → Calls `getServerSession` (server) or `useSession` (client) → Loads session info from here.
+3. **User logs out** → Hits this route → Session is destroyed.
+
+---
+
+### Summary Table
+
+| Part                    | Code Location                              | What it does                                   |
+| :---------------------- | :----------------------------------------- | :--------------------------------------------- |
+| CredentialsProvider     | providers array                            | Handles email/password login                   |
+| authorize()             | CredentialsProvider                        | Checks credentials, returns user if valid      |
+| PrismaAdapter           | adapter                                    | Connects next-auth to your DB                  |
+| callbacks.jwt, .session | callbacks                                  | Adds user info (e.g., role) to the session/JWT |
+| export handler          | export { handler as GET, handler as POST } | Handles all auth-related HTTP requests         |
+
+---
+
+**In short:**  
+This route is the "brain" of authentication in your app. It securely checks credentials, manages sessions, and makes sure only the right info is shared with the UI and other API routes.
+
+If you want examples of adding OAuth providers, customizing session logic, or more, just ask!
+
+---
+
+## 7. Successful registration => auto-login => redirect to /dashboard (protected page)
+
+##### TODO HEREEEE
+
+## 8. Login Form (Mantine + next-auth)
+
+Create `/components/LoginForm.tsx`:
+
+```typescript
+import { useForm } from '@mantine/form';
+import { TextInput, PasswordInput, Button, Alert } from '@mantine/core';
+import { useState } from 'react';
+import { signIn } from "next-auth/react";
 
 export function LoginForm() {
-  // ...existing state & form setup
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const form = useForm({
+    initialValues: { email: '', password: '' },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     const { email, password } = form.values;
 
-    const res = await signIn('credentials', {
+    const res = await signIn("credentials", {
       email,
       password,
       redirect: false,
@@ -372,57 +346,87 @@ export function LoginForm() {
     if (res?.error) {
       setError(res.error);
     } else {
-      // Optionally redirect to a protected page
-      window.location.href = '/profile';
+      window.location.href = "/profile";
     }
     setLoading(false);
   };
 
-  return <form onSubmit={handleSubmit}>{/* ...fields and UI */}</form>;
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextInput label="Email" {...form.getInputProps('email')} required />
+      <PasswordInput label="Password" {...form.getInputProps('password')} required />
+      {error && <Alert color="red">{error}</Alert>}
+      <Button type="submit" loading={loading} mt="md">Login</Button>
+    </form>
+  );
 }
 ```
 
 ---
 
-## **Step 8: Protecting Pages/Server Components**
+## 8. Protecting Pages / Server Components
 
-**In a server component:**
+Example: `/app/profile/page.tsx` (server component):
 
-```ts
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+```typescript
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
-  if (!session) {
-    // redirect to login or show unauthorized
-  }
-  // session.user.role is available!
+  if (!session) redirect("/login");
+
+  return (
+    <div>
+      <h1>Welcome, {session.user?.name || session.user?.email}</h1>
+      <p>Your role: {session.user?.role}</p>
+    </div>
+  );
 }
 ```
 
 ---
 
-# **Summary Table**
+## 9. Role-based Authorization Example
 
-| Step                 | File/Location                         | Purpose                            |
-| -------------------- | ------------------------------------- | ---------------------------------- |
-| Install packages     | Terminal                              | next-auth, Prisma adapter, bcrypt  |
-| Update Prisma schema | `prisma/schema.prisma`                | User model with password/role      |
-| Prisma client        | `lib/prisma.ts`                       | Singleton for DB access            |
-| Auth API route       | `app/api/auth/[...nextauth]/route.ts` | next-auth config with credentials  |
-| Register API route   | `app/api/register/route.ts`           | Handles user registration          |
-| Registration form    | `components/RegistrationForm.tsx`     | Calls register API                 |
-| Login form           | `components/LoginForm.tsx`            | Calls next-auth signIn             |
-| Protect pages        | Any server component                  | Use session helpers to check login |
+To restrict access to admins only:
+
+```typescript
+if (!session || session.user?.role !== 'admin') {
+  redirect('/unauthorized');
+}
+```
 
 ---
 
-**Let me know if you want a complete copy-paste example for any part, or additional info on session management, role-based access, or UI integration with Mantine!**
+## 10. Summary Table
 
-Certainly! Here’s an example of a **project folder structure** for a Next.js 15 app using the **App Router**, **next-auth**, **Prisma 6**, **Mantine 8**, and custom registration/login forms.
+| Step                 | File/Location                       | Purpose                                  |
+| :------------------- | :---------------------------------- | :--------------------------------------- |
+| Install packages     | Terminal                            | next-auth, Prisma adapter, bcrypt        |
+| Update Prisma schema | prisma/schema.prisma                | User model with password/role            |
+| Prisma client        | lib/prisma.ts                       | Singleton for DB access                  |
+| Auth API route       | app/api/auth/[...nextauth]/route.ts | next-auth config with credentials        |
+| Register API route   | app/api/register/route.ts           | Handles user registration                |
+| Registration form    | components/RegistrationForm.tsx     | Calls register API                       |
+| Login form           | components/LoginForm.tsx            | Calls next-auth signIn                   |
+| Protect pages        | Any server component                | Use session helpers to check login/roles |
 
 ---
+
+### 📝 **Notes & Best Practices**
+
+- Mantine is used for UI forms; you can style as you wish.
+- Role-based protection: Expand session checks for role-based redirects.
+- Session management: Use `getServerSession` in server components, or `useSession` in client components.
+- Social login: Add more providers (Google, GitHub, etc.) to the `providers` array in next-auth config.
+- Security: Always hash passwords! Never log or send plain-text passwords.
+- ENV config: Use `.env.local` for secrets and database URLs.
+
+---
+
+# Example Project Structure
 
 ## **Example Project Structure**
 
