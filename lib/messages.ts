@@ -1,6 +1,6 @@
 export const messages = {
   registration: {
-    success: 'Registration successful! You can now log in.',
+    success: 'Registration successful! Logging you in...',
     failed: 'Registration failed. Please try again.',
     emailTaken: 'Email already registered.',
     nameTooShort: 'Name must be at least 3 characters long.',

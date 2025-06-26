@@ -1,9 +1,12 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Alert, Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { registerUser } from '@/app/register/actions';
+import { messages } from '@/lib/messages';
 import { FormFields } from '@/types/registration';
 
 export function RegistrationForm() {
@@ -12,6 +15,8 @@ export function RegistrationForm() {
     error: null,
   });
   const [showMessage, setShowMessage] = useState<null | 'success' | 'error'>(null);
+  const [autoLogin, setAutoLogin] = useState(false);
+  const router = useRouter();
 
   const form = useForm<FormFields>({
     initialValues: {
@@ -21,11 +26,11 @@ export function RegistrationForm() {
       confirmPassword: '',
     },
     validate: {
-      name: (value) => (value.length >= 3 ? null : 'Name too short'),
-      email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : 'Invalid email'),
-      password: (value) => (value.length >= 6 ? null : 'Password must be at least 6 characters'),
+      name: (value) => (value.length >= 3 ? null : messages.registration.nameTooShort),
+      email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : messages.registration.invalidEmail),
+      password: (value) => (value.length >= 6 ? null : messages.registration.passwordTooShort),
       confirmPassword: (value, values) =>
-        value === values.password ? null : 'Passwords do not match',
+        value === values.password ? null : messages.registration.passwordsDoNotMatch,
     },
     onSubmitPreventDefault: 'validation-failed',
   });
@@ -44,8 +49,33 @@ export function RegistrationForm() {
 
     if (state?.success) {
       setShowMessage('success');
+      setAutoLogin(true);
     }
   }, [state]);
+
+  // Auto-login effect
+  useEffect(() => {
+    if (autoLogin) {
+      console.log('AUTOLOGIN TRUE');
+
+      // Wait a short moment to show the success message, then sign in
+      const timer = setTimeout(async () => {
+        const res = await signIn('credentials', {
+          email: form.values.email,
+          password: form.values.password,
+          redirect: false,
+        });
+        if (res && !res.error) {
+          // Wait another moment for UX, then redirect
+          setTimeout(() => router.push('/dashboard'), 1000);
+        } else {
+          // Handle sign-in error if needed
+        }
+      }, 1200); // 1.2 seconds before auto-login
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoLogin, form.values.email, form.values.password, router]);
 
   // issue that this solves:
   // if you get back an error from the server action, if the user starts typing, the error is not cleared immediately
@@ -115,7 +145,7 @@ export function RegistrationForm() {
                 </Alert>
               )}
 
-              <Button type="submit" fullWidth>
+              <Button type="submit" fullWidth disabled={isPending || autoLogin}>
                 Register
               </Button>
             </Stack>

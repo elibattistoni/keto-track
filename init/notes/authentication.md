@@ -311,6 +311,85 @@ If you want examples of adding OAuth providers, customizing session logic, or mo
 
 ## 7. Successful registration => auto-login => redirect to /dashboard (protected page)
 
+see `RegistrationForm.tsx`
+
+### Protecting `/dashboard` page
+
+Make sure your ⁠/dashboard page is protected using `⁠getServerSession` (server component) or `⁠useSession` (client component):
+
+app/dashboard/page.tsx
+
+```tsx
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/login');
+  return <div>Welcome to your dashboard, {session.user?.name || session.user?.email}!</div>;
+}
+```
+
+Don't you need `import { SessionProvider } from 'next-auth/react';`?
+**You do not need to use `SessionProvider` in `dashboard/page.tsx` if it is a server component and you are using `getServerSession`.**
+
+- `SessionProvider` from `next-auth/react` is **only needed in client components** that use the `useSession` hook or want to access session context on the client side.
+- In server components (like your `app/dashboard/page.tsx`), you use `getServerSession` to fetch the session directly on the server, so there's no need for the context provider.
+
+#### 1. **Server Component (App Router, e.g. `/app/dashboard/page.tsx`):**
+
+```typescript
+// app/dashboard/page.tsx
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/login');
+  return <div>Welcome to your dashboard, {session.user?.name || session.user?.email}!</div>;
+}
+```
+
+**No need for `SessionProvider` here.**
+
+---
+
+#### 2. **Client Component (e.g. `/components/UserMenu.tsx`):**
+
+If you need session info on the client (e.g., for a user menu, navbar, etc.), you should wrap your app (usually in `app/layout.tsx`) with `SessionProvider`:
+
+```typescript
+// app/layout.tsx (or a client layout)
+'use client';
+import { SessionProvider } from 'next-auth/react';
+
+export default function RootLayout({ children }) {
+  return (
+    <SessionProvider>
+      {children}
+    </SessionProvider>
+  );
+}
+```
+
+Then, in your client components, you can use:
+
+```typescript
+import { useSession } from 'next-auth/react';
+
+export function UserMenu() {
+  const { data: session } = useSession();
+  // ...
+}
+```
+
+**In short:**
+
+- Use `getServerSession` on the server (no provider needed).
+- Use `SessionProvider` + `useSession` on the client.
+
 ##### TODO HEREEEE
 
 ## 8. Login Form (Mantine + next-auth)
