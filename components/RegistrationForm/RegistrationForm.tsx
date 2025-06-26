@@ -175,5 +175,3 @@ export function RegistrationForm() {
     </Stack>
   );
 }
-
-// Mantine validation docs: https://mantine.dev/form/use-form/#validation
