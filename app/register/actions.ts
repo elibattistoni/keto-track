@@ -4,8 +4,8 @@
 import { registerUserLogic } from '@/lib/auth/register';
 import { RegisterUserResponse } from '@/types/registration';
 
-export async function registerUser(
-  prevState: any,
+export default async function registerUser(
+  prevState: RegisterUserResponse,
   formData: FormData
 ): Promise<RegisterUserResponse> {
   const name = String(formData.get('name') || '');

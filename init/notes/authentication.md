@@ -390,58 +390,35 @@ export function UserMenu() {
 - Use `getServerSession` on the server (no provider needed).
 - Use `SessionProvider` + `useSession` on the client.
 
-##### TODO HEREEEE
+## 8. Logout functionality
+
+To set up logout functionality with NextAuth.js in your Next.js project, you mainly need to use the built-in NextAuth signOut method on the client side. The backend (your route.ts) is already configured to handle authentication, including sign-out, via the NextAuth API.
+
+Here’s how you can add logout functionality:
+
+- Use the signOut function from next-auth/react in your frontend components (e.g., in your header, dashboard, or user menu).
+- Optionally, you can redirect users after logout.
+
+No backend changes are needed—NextAuth handles the sign-out route automatically at /api/auth/signout.
+
+With NextAuth.js, the logout (sign-out) process is initiated client-side using the signOut function from next-auth/react. However, this function actually makes a request to the built-in NextAuth API route (/api/auth/signout), which is handled server-side by NextAuth.
+
+So, to clarify:
+
+- You trigger logout from the client (e.g., with a button).
+- The actual session/token invalidation and cleanup are handled server-side by NextAuth (via the API route).
+
+You do not need to write custom server-side code for logout—NextAuth already provides and handles the necessary API endpoint. You just need to call signOut() on the client.
+
+If you want to customize the server-side sign-out logic, you would need to override NextAuth’s default behavior, but for most use cases, the built-in functionality is sufficient and secure.
 
 ## 8. Login Form (Mantine + next-auth)
 
-Create `/components/LoginForm.tsx`:
-
-```typescript
-import { useForm } from '@mantine/form';
-import { TextInput, PasswordInput, Button, Alert } from '@mantine/core';
-import { useState } from 'react';
-import { signIn } from "next-auth/react";
-
-export function LoginForm() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const form = useForm({
-    initialValues: { email: '', password: '' },
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    const { email, password } = form.values;
-
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (res?.error) {
-      setError(res.error);
-    } else {
-      window.location.href = "/profile";
-    }
-    setLoading(false);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <TextInput label="Email" {...form.getInputProps('email')} required />
-      <PasswordInput label="Password" {...form.getInputProps('password')} required />
-      {error && <Alert color="red">{error}</Alert>}
-      <Button type="submit" loading={loading} mt="md">Login</Button>
-    </form>
-  );
-}
-```
+Create `/components/LoginForm/LoginForm.tsx`:
 
 ---
+
+## TODO ELISA HEREEE
 
 ## 8. Protecting Pages / Server Components
 

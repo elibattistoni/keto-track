@@ -1,5 +1,5 @@
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
-import { Header } from '@/components';
+import { Header, NextAuthSessionProvider } from '@/components';
 import { theme } from '@/theme';
 
 import '@mantine/core/styles.css';
@@ -25,8 +25,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
-          <Header />
-          {children}
+          <NextAuthSessionProvider>
+            <Header />
+            {children}
+          </NextAuthSessionProvider>
         </MantineProvider>
       </body>
     </html>

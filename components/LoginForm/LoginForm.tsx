@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { Alert, Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
+import { messages } from '@/lib/messages';
 
 // TODO improve code
 
@@ -16,12 +18,34 @@ export function LoginForm() {
       password: '',
     },
     validate: {
-      email: (value) => isNotEmpty('Insert email')(value) || isEmail('Invalid email')(value),
+      email: (value) =>
+        isNotEmpty(messages.login.emailRequired)(value) ||
+        isEmail(messages.login.invalidEmail)(value),
       password: (value) =>
-        isNotEmpty('Insert password')(value) ||
-        hasLength({ min: 6 }, 'Password must be at least 6 characters')(value),
+        isNotEmpty(messages.login.passwordRequired)(value) ||
+        hasLength({ min: 6 }, messages.login.passwordTooShort)(value),
     },
   });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    const { email, password } = form.values;
+
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      window.location.href = '/dashboard';
+    }
+    setLoading(false);
+  };
 
   return (
     <Stack align="center" justify="center">
@@ -32,7 +56,7 @@ export function LoginForm() {
             Enter your credentials to access your account
           </Text>
           {/* TODO FORM: transform into server action */}
-          <form>
+          <form onSubmit={handleSubmit}>
             <Stack>
               <TextInput
                 label="Email"

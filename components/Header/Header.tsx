@@ -11,6 +11,7 @@ import {
   IconFingerprint,
   IconNotification,
 } from '@tabler/icons-react';
+import { useSession } from 'next-auth/react';
 import {
   Anchor,
   Box,
@@ -31,6 +32,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ColorSchemeToggle } from '../ColorSchemeToggle/ColorSchemeToggle';
+import { LogoutButton } from '../LogoutButton/LogoutButton';
 import classes from './Header.module.css';
 
 // TODO
@@ -73,6 +75,8 @@ export function Header() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
   const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
   const theme = useMantineTheme();
+
+  const { data: session } = useSession();
 
   const links = mockdata.map((item) => (
     <UnstyledButton className={classes.subLink} key={item.title}>
@@ -153,6 +157,7 @@ export function Header() {
           <Group visibleFrom="sm">
             <ColorSchemeToggle />
             {/* TODO ELISA if the user is authenticated, show the user icon and menu */}
+            {session && <LogoutButton />}
           </Group>
 
           <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
@@ -193,6 +198,7 @@ export function Header() {
           <Group justify="center" grow pb="xl" px="md">
             <ColorSchemeToggle />
             {/* TODO ELISA if the user is authenticated, show the user icon and menu */}
+            {session && <LogoutButton />}
           </Group>
         </ScrollArea>
       </Drawer>

@@ -4,8 +4,8 @@ import { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Alert, Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { registerUser } from '@/app/register/actions';
+import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
+import registerUser from '@/app/register/actions';
 import { messages } from '@/lib/messages';
 import { FormFields } from '@/types/registration';
 
@@ -26,12 +26,21 @@ export function RegistrationForm() {
       confirmPassword: '',
     },
     validate: {
-      name: (value) => (value.length >= 3 ? null : messages.registration.nameTooShort),
-      email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : messages.registration.invalidEmail),
-      password: (value) => (value.length >= 6 ? null : messages.registration.passwordTooShort),
+      name: (value) =>
+        isNotEmpty(messages.registration.nameRequired)(value) ||
+        hasLength({ min: 3 }, messages.registration.nameTooShort)(value),
+      email: (value) =>
+        isNotEmpty(messages.registration.emailRequired)(value) ||
+        isEmail(messages.registration.invalidEmail)(value),
+      password: (value) =>
+        isNotEmpty(messages.registration.passwordRequired)(value) ||
+        hasLength({ min: 6 }, messages.registration.passwordTooShort)(value),
       confirmPassword: (value, values) =>
-        value === values.password ? null : messages.registration.passwordsDoNotMatch,
+        isNotEmpty(messages.registration.confirmPasswordRequired)(value) ||
+        (value !== values.password ? messages.registration.passwordsDoNotMatch : null),
     },
+    // validateInputOnChange: true,
+    validateInputOnBlur: true,
     onSubmitPreventDefault: 'validation-failed',
   });
 
@@ -65,11 +74,17 @@ export function RegistrationForm() {
           password: form.values.password,
           redirect: false,
         });
+
+        // if successful, redirect to dashboard
         if (res && !res.error) {
           // Wait another moment for UX, then redirect
           setTimeout(() => router.push('/dashboard'), 1000);
-        } else {
-          // Handle sign-in error if needed
+        }
+
+        // if there was an error, show it
+        if (res && res.error) {
+          form.setErrors({ ...form.errors, general: messages.login.autoLoginFailed });
+          setShowMessage('error');
         }
       }, 1200); // 1.2 seconds before auto-login
 
@@ -145,7 +160,12 @@ export function RegistrationForm() {
                 </Alert>
               )}
 
-              <Button type="submit" fullWidth disabled={isPending || autoLogin}>
+              <Button
+                type="submit"
+                fullWidth
+                disabled={isPending || autoLogin}
+                loading={isPending || autoLogin}
+              >
                 Register
               </Button>
             </Stack>
@@ -155,3 +175,5 @@ export function RegistrationForm() {
     </Stack>
   );
 }
+
+// Mantine validation docs: https://mantine.dev/form/use-form/#validation
