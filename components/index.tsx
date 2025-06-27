@@ -1,3 +1,4 @@
+export { AffixMenu } from './AffixMenu/AffixMenu';
 export { GoogleButton } from './GoogleButton/GoogleButton';
 export { Header } from './Header/Header';
 export { LoginForm } from './LoginForm/LoginForm';

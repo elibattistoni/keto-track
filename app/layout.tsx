@@ -1,12 +1,10 @@
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
-import { Header, NextAuthSessionProvider } from '@/components';
+import { AffixMenu, Header, NextAuthSessionProvider } from '@/components';
 import { theme } from '@/theme';
 
 import '@mantine/core/styles.css';
 
 import { ReactNode } from 'react';
-
-// TODO  ADD FOOTER
 
 export const metadata = {
   title: 'Keto Track App',
@@ -28,6 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <NextAuthSessionProvider>
             <Header />
             {children}
+            <AffixMenu />
           </NextAuthSessionProvider>
         </MantineProvider>
       </body>

@@ -21,7 +21,7 @@ import {
   Title,
 } from '@mantine/core';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
-import registerUser from '@/app/register/actions';
+import registerUser from '@/app/(authentication)/register/actions';
 import { messages } from '@/lib/messages';
 import { FormFields } from '@/types/registration';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
