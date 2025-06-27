@@ -13,11 +13,14 @@ export const messages = {
     confirmPasswordRequired: 'Please confirm your password',
   },
   login: {
+    success: 'Login successful! Redirecting to dashboard...',
+    failed: 'Login failed. Please check your credentials and try again.',
     emailRequired: 'Insert email.',
     invalidEmail: 'Invalid email.',
     passwordRequired: 'Insert password.',
     passwordTooShort: 'Password must be at least 6 characters',
     autoLoginFailed: 'Auto-login failed. Please log in manually.',
-    loginFailed: 'Login failed. Please check your credentials and try again.',
+    checkEmail: 'Check your email',
+    checkPassword: 'Check your password',
   },
 };

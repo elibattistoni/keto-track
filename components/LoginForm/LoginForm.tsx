@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import {
   Alert,
@@ -10,6 +11,7 @@ import {
   Container,
   Divider,
   Group,
+  LoadingOverlay,
   Paper,
   PasswordInput,
   Stack,
@@ -18,13 +20,16 @@ import {
 } from '@mantine/core';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
 import { messages } from '@/lib/messages';
+import { FormFields } from '@/types/registration';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
 
 // TODO improve code with LoadingOverlay & message
 
 export function LoginForm() {
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<null | 'success' | 'error'>(null);
+  const showOverlay = loading || !!message;
 
   const form = useForm({
     initialValues: {
@@ -39,11 +44,18 @@ export function LoginForm() {
         isNotEmpty(messages.login.passwordRequired)(value) ||
         hasLength({ min: 6 }, messages.login.passwordTooShort)(value),
     },
+    validateInputOnBlur: true,
   });
+
+  useEffect(() => {
+    if (message && !loading) {
+      const timer = setTimeout(() => setMessage(null), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [message, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
     const { email, password } = form.values;
 
@@ -54,15 +66,38 @@ export function LoginForm() {
     });
 
     if (res?.error) {
-      setError(res.error);
+      setMessage('error');
+      form.setFieldError('email', messages.login.checkEmail);
+      form.setFieldError('password', messages.login.checkPassword);
     } else {
-      window.location.href = '/dashboard';
+      setMessage('success');
+      setTimeout(() => router.push('/dashboard'), 1000);
     }
+
     setLoading(false);
   };
 
+  const handleFieldChange =
+    (field: keyof Partial<FormFields>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      form.setFieldValue(field, event.currentTarget.value);
+      form.clearFieldError(field);
+    };
+
   return (
     <Container size="xs">
+      <LoadingOverlay
+        visible={showOverlay}
+        zIndex={1000}
+        overlayProps={{ radius: 'sm', blur: 2 }}
+        loaderProps={{
+          children: message && (
+            <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
+              {message === 'error' ? messages.login.failed : messages.login.success}
+            </Alert>
+          ),
+        }}
+        styles={{ root: { width: '100vw', height: '100vh' } }}
+      />
       <Paper shadow="md" p="xl" withBorder>
         <Stack>
           <Title order={2} ta="center">
@@ -82,6 +117,7 @@ export function LoginForm() {
                 withAsterisk
                 key={form.key('email')}
                 {...form.getInputProps('email')}
+                onChange={handleFieldChange('email')}
               />
               <PasswordInput
                 label="Password"
@@ -89,18 +125,14 @@ export function LoginForm() {
                 withAsterisk
                 key={form.key('password')}
                 {...form.getInputProps('password')}
+                onChange={handleFieldChange('password')}
               />
-              {error && (
-                <Alert color="red" variant="light">
-                  {error}
-                </Alert>
-              )}
 
               <Group justify="space-between" mt="lg">
                 <Anchor component={Link} href="/register" c="dimmed" size="xs">
                   Don't have an account? Register
                 </Anchor>
-                <Button type="submit" radius="xl">
+                <Button type="submit" radius="xl" disabled={loading} loading={loading}>
                   Login
                 </Button>
               </Group>

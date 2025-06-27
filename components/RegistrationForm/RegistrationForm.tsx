@@ -9,7 +9,6 @@ import { signIn } from 'next-auth/react';
 import {
   Alert,
   Anchor,
-  Box,
   Button,
   Container,
   Divider,
@@ -36,11 +35,11 @@ export function RegistrationForm() {
     error: null,
   });
 
-  const [showMessage, setShowMessage] = useState<null | 'success' | 'error'>(null);
+  const [message, setMessage] = useState<null | 'success' | 'error'>(null);
   const [autoLogin, setAutoLogin] = useState<boolean>(false);
   const isLoading = isPending || autoLogin;
   // the !! converts the value to a boolean (false if ShowMessage is null, otherwise true)
-  const showOverlay = isLoading || !!showMessage;
+  const showOverlay = isLoading || !!message;
 
   const iconAt = <IconAt size={16} />;
   const iconLock = <IconLock size={18} stroke={1.5} />;
@@ -80,11 +79,11 @@ export function RegistrationForm() {
     }
 
     if (state?.error?.general) {
-      setShowMessage('error');
+      setMessage('error');
     }
 
     if (state?.success) {
-      setShowMessage('success');
+      setMessage('success');
       setAutoLogin(true);
     }
   }, [state]);
@@ -111,7 +110,7 @@ export function RegistrationForm() {
         // if there was an error, show it
         if (res && res.error) {
           form.setErrors({ ...form.errors, general: messages.login.autoLoginFailed });
-          setShowMessage('error');
+          setMessage('error');
         }
       }, 1200); // 1.2 seconds before auto-login
 
@@ -121,11 +120,11 @@ export function RegistrationForm() {
 
   // Show message for a short time after it appears
   useEffect(() => {
-    if (showMessage && !isLoading) {
-      const timer = setTimeout(() => setShowMessage(null), 2000);
+    if (message && !isLoading) {
+      const timer = setTimeout(() => setMessage(null), 2000);
       return () => clearTimeout(timer);
     }
-  }, [showMessage, isLoading]);
+  }, [message, isLoading]);
 
   // issue that this solves:
   // if you get back an error from the server action, if the user starts typing, the error is not cleared immediately
@@ -138,97 +137,89 @@ export function RegistrationForm() {
       form.setFieldValue(field, event.currentTarget.value);
       // clear error for that field
       form.clearFieldError(field);
-      // remove the general error/message if the user starts typing
-      if (showMessage === 'error' || showMessage === 'success') {
-        setShowMessage(null);
-      }
     };
 
   return (
-    <>
-      <Box pos="relative">
-        <LoadingOverlay
-          visible={showOverlay}
-          zIndex={1000}
-          overlayProps={{ radius: 'sm', blur: 2 }}
-          loaderProps={{
-            children: showMessage && (
-              <Alert color={showMessage === 'error' ? 'red' : 'green'} variant="light">
-                {showMessage === 'error' ? state?.error?.general : state?.success}
-              </Alert>
-            ),
-          }}
-        />
-
-        <Container size="xs">
-          <Paper shadow="md" p="xl" withBorder>
+    <Container size="xs">
+      <LoadingOverlay
+        visible={showOverlay}
+        zIndex={1000}
+        overlayProps={{ radius: 'sm', blur: 2 }}
+        loaderProps={{
+          children: message && (
+            <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
+              {message === 'error' ? state?.error?.general : state?.success}
+            </Alert>
+          ),
+        }}
+        styles={{ root: { width: '100vw', height: '100vh' } }}
+      />
+      <Paper shadow="md" p="xl" withBorder>
+        <Stack>
+          <Title order={2} ta="center">
+            Welcome to KetoTrack
+          </Title>
+          <Divider label="Register with" labelPosition="center" my="xs" />
+          <Group justify="center">
+            <GoogleButton radius="xl">Google</GoogleButton>
+          </Group>
+          <Divider label="Or continue with email" labelPosition="center" my="xs" />
+          {/* action triggers the server action, which performs server side validation */}
+          {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
+          <form action={formAction} onSubmit={form.onSubmit(() => {})}>
             <Stack>
-              <Title order={2} ta="center">
-                Welcome to KetoTrack
-              </Title>
-              <Divider label="Register with" labelPosition="center" my="xs" />
-              <Group justify="center">
-                <GoogleButton radius="xl">Google</GoogleButton>
+              <TextInput
+                label="Name"
+                placeholder="Your name"
+                {...form.getInputProps('name')}
+                withAsterisk
+                name="name"
+                type="text"
+                onChange={handleFieldChange('name')}
+              />
+              <TextInput
+                label="Email"
+                placeholder="you@example.com"
+                {...form.getInputProps('email')}
+                withAsterisk
+                name="email"
+                type="email"
+                onChange={handleFieldChange('email')}
+                leftSectionPointerEvents="none"
+                leftSection={iconAt}
+              />
+              <StrengthMeterPasswordInput
+                label="Password"
+                placeholder="Your password"
+                {...form.getInputProps('password')}
+                withAsterisk
+                name="password"
+                onChange={handleFieldChange('password')}
+                leftSectionPointerEvents="none"
+                leftSection={iconLock}
+              />
+              <PasswordInput
+                label="Confirm Password"
+                placeholder="Repeat your password"
+                {...form.getInputProps('confirmPassword')}
+                withAsterisk
+                name="confirmPassword"
+                onChange={handleFieldChange('confirmPassword')}
+                leftSectionPointerEvents="none"
+                leftSection={iconLock}
+              />
+              <Group justify="space-between" mt="lg">
+                <Anchor component={Link} href="/login" c="dimmed" size="xs">
+                  Already have an account? Login
+                </Anchor>
+                <Button type="submit" disabled={isLoading} loading={isLoading} radius="xl">
+                  Register
+                </Button>
               </Group>
-              <Divider label="Or continue with email" labelPosition="center" my="xs" />
-              {/* action triggers the server action, which performs server side validation */}
-              {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
-              <form action={formAction} onSubmit={form.onSubmit(() => {})}>
-                <Stack>
-                  <TextInput
-                    label="Name"
-                    placeholder="Your name"
-                    {...form.getInputProps('name')}
-                    withAsterisk
-                    name="name"
-                    type="text"
-                    onChange={handleFieldChange('name')}
-                  />
-                  <TextInput
-                    label="Email"
-                    placeholder="you@example.com"
-                    {...form.getInputProps('email')}
-                    withAsterisk
-                    name="email"
-                    type="email"
-                    onChange={handleFieldChange('email')}
-                    leftSectionPointerEvents="none"
-                    leftSection={iconAt}
-                  />
-                  <StrengthMeterPasswordInput
-                    label="Password"
-                    placeholder="Your password"
-                    {...form.getInputProps('password')}
-                    withAsterisk
-                    name="password"
-                    onChange={handleFieldChange('password')}
-                    leftSectionPointerEvents="none"
-                    leftSection={iconLock}
-                  />
-                  <PasswordInput
-                    label="Confirm Password"
-                    placeholder="Repeat your password"
-                    {...form.getInputProps('confirmPassword')}
-                    withAsterisk
-                    name="confirmPassword"
-                    onChange={handleFieldChange('confirmPassword')}
-                    leftSectionPointerEvents="none"
-                    leftSection={iconLock}
-                  />
-                  <Group justify="space-between" mt="lg">
-                    <Anchor component={Link} href="/login" c="dimmed" size="xs">
-                      Already have an account? Login
-                    </Anchor>
-                    <Button type="submit" disabled={isLoading} loading={isLoading} radius="xl">
-                      Register
-                    </Button>
-                  </Group>
-                </Stack>
-              </form>
             </Stack>
-          </Paper>
-        </Container>
-      </Box>
-    </>
+          </form>
+        </Stack>
+      </Paper>
+    </Container>
   );
 }
