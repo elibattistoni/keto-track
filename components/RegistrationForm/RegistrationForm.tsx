@@ -33,9 +33,10 @@ export function RegistrationForm() {
   });
 
   const [showMessage, setShowMessage] = useState<null | 'success' | 'error'>(null);
-  const [showOverlay, setShowOverlay] = useState<boolean>(false);
   const [autoLogin, setAutoLogin] = useState<boolean>(false);
   const isLoading = isPending || autoLogin;
+  // the !! converts the value to a boolean (false if ShowMessage is null, otherwise true)
+  const showOverlay = isLoading || !!showMessage;
 
   const iconAt = <IconAt size={16} />;
   const iconLock = <IconLock size={18} stroke={1.5} />;
@@ -114,22 +115,13 @@ export function RegistrationForm() {
     }
   }, [autoLogin, form.values.email, form.values.password, router]);
 
-  // Control overlay visibility
+  // Show message for a short time after it appears
   useEffect(() => {
-    if (isLoading) {
-      setShowOverlay(true);
-    } else if (showMessage) {
-      // Keep overlay for 2s after message appears
-      setShowOverlay(true);
-      const timer = setTimeout(() => {
-        setShowOverlay(false);
-        setShowMessage(null);
-      }, 2000);
+    if (showMessage && !isLoading) {
+      const timer = setTimeout(() => setShowMessage(null), 2000);
       return () => clearTimeout(timer);
-    } else {
-      setShowOverlay(false);
     }
-  }, [isLoading, showMessage]);
+  }, [showMessage, isLoading]);
 
   // issue that this solves:
   // if you get back an error from the server action, if the user starts typing, the error is not cleared immediately

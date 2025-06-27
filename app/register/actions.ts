@@ -4,7 +4,7 @@
 import { registerUserLogic } from '@/lib/auth/register';
 import { RegisterUserResponse } from '@/types/registration';
 
-const SIMULATE_DELAY = false;
+const SIMULATE_DELAY = true;
 
 // Helper to simulate network delay (development only)
 function delay(ms: number) {
