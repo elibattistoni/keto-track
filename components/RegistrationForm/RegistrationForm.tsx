@@ -2,21 +2,43 @@
 
 import { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import IconAt from '@tabler/icons-react/dist/esm/icons/IconAt';
+import IconLock from '@tabler/icons-react/dist/esm/icons/IconLock';
 import { signIn } from 'next-auth/react';
-import { Alert, Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
+import {
+  Alert,
+  Box,
+  Button,
+  Container,
+  LoadingOverlay,
+  Paper,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
 import registerUser from '@/app/register/actions';
 import { messages } from '@/lib/messages';
 import { FormFields } from '@/types/registration';
+import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
 
 export function RegistrationForm() {
+  const router = useRouter();
+
   const [state, formAction, isPending] = useActionState(registerUser, {
     success: null,
     error: null,
   });
+
   const [showMessage, setShowMessage] = useState<null | 'success' | 'error'>(null);
-  const [autoLogin, setAutoLogin] = useState(false);
-  const router = useRouter();
+  const [showOverlay, setShowOverlay] = useState<boolean>(false);
+  const [autoLogin, setAutoLogin] = useState<boolean>(false);
+  const isLoading = isPending || autoLogin;
+
+  const iconAt = <IconAt size={16} />;
+  const iconLock = <IconLock size={18} stroke={1.5} />;
 
   const form = useForm<FormFields>({
     initialValues: {
@@ -92,6 +114,23 @@ export function RegistrationForm() {
     }
   }, [autoLogin, form.values.email, form.values.password, router]);
 
+  // Control overlay visibility
+  useEffect(() => {
+    if (isLoading) {
+      setShowOverlay(true);
+    } else if (showMessage) {
+      // Keep overlay for 2s after message appears
+      setShowOverlay(true);
+      const timer = setTimeout(() => {
+        setShowOverlay(false);
+        setShowMessage(null);
+      }, 2000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowOverlay(false);
+    }
+  }, [isLoading, showMessage]);
+
   // issue that this solves:
   // if you get back an error from the server action, if the user starts typing, the error is not cleared immediately
   // which is what we want for better UX
@@ -110,68 +149,80 @@ export function RegistrationForm() {
     };
 
   return (
-    <Stack align="center" justify="center">
-      <Paper shadow="md" p="xl" withBorder style={{ minWidth: 320, maxWidth: 400 }}>
-        <Stack>
-          <Title order={2}>Register</Title>
-          <Text size="sm">Create a new account</Text>
-          {/* action triggers the server action, which performs server side validation */}
-          {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
-          <form action={formAction} onSubmit={form.onSubmit(() => {})}>
+    <>
+      <Box pos="relative">
+        <LoadingOverlay
+          visible={showOverlay}
+          zIndex={1000}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{
+            children: showMessage && (
+              <Alert color={showMessage === 'error' ? 'red' : 'green'} variant="light">
+                {showMessage === 'error' ? state?.error?.general : state?.success}
+              </Alert>
+            ),
+          }}
+        />
+
+        <Container size="xs">
+          <Paper shadow="md" p="xl" withBorder>
             <Stack>
-              <TextInput
-                label="Name"
-                placeholder="Your name"
-                {...form.getInputProps('name')}
-                withAsterisk
-                name="name"
-                type="text"
-                onChange={handleFieldChange('name')}
-              />
-              <TextInput
-                label="Email"
-                placeholder="you@example.com"
-                {...form.getInputProps('email')}
-                withAsterisk
-                name="email"
-                type="email"
-                onChange={handleFieldChange('email')}
-              />
-              <PasswordInput
-                label="Password"
-                placeholder="Your password"
-                {...form.getInputProps('password')}
-                withAsterisk
-                name="password"
-                onChange={handleFieldChange('password')}
-              />
-              <PasswordInput
-                label="Confirm Password"
-                placeholder="Repeat your password"
-                {...form.getInputProps('confirmPassword')}
-                withAsterisk
-                name="confirmPassword"
-                onChange={handleFieldChange('confirmPassword')}
-              />
+              <Title order={2}>Register</Title>
+              <Text size="sm">Create a new account</Text>
+              {/* action triggers the server action, which performs server side validation */}
+              {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
+              <form action={formAction} onSubmit={form.onSubmit(() => {})}>
+                <Stack>
+                  <TextInput
+                    label="Name"
+                    placeholder="Your name"
+                    {...form.getInputProps('name')}
+                    withAsterisk
+                    name="name"
+                    type="text"
+                    onChange={handleFieldChange('name')}
+                  />
+                  <TextInput
+                    label="Email"
+                    placeholder="you@example.com"
+                    {...form.getInputProps('email')}
+                    withAsterisk
+                    name="email"
+                    type="email"
+                    onChange={handleFieldChange('email')}
+                    leftSectionPointerEvents="none"
+                    leftSection={iconAt}
+                  />
+                  <StrengthMeterPasswordInput
+                    label="Password"
+                    placeholder="Your password"
+                    {...form.getInputProps('password')}
+                    withAsterisk
+                    name="password"
+                    onChange={handleFieldChange('password')}
+                    leftSectionPointerEvents="none"
+                    leftSection={iconLock}
+                  />
+                  <PasswordInput
+                    label="Confirm Password"
+                    placeholder="Repeat your password"
+                    {...form.getInputProps('confirmPassword')}
+                    withAsterisk
+                    name="confirmPassword"
+                    onChange={handleFieldChange('confirmPassword')}
+                    leftSectionPointerEvents="none"
+                    leftSection={iconLock}
+                  />
 
-              {showMessage && (
-                <Alert color={showMessage === 'error' ? 'red' : 'green'} variant="light">
-                  {showMessage === 'error' ? state?.error?.general : state?.success}
-                </Alert>
-              )}
-
-              <Button
-                type="submit"
-                fullWidth
-                disabled={isPending || autoLogin}
-                loading={isPending || autoLogin}
-              >
-                Register
-              </Button>
+                  <Button type="submit" fullWidth disabled={isLoading} loading={isLoading} mt="md">
+                    Register
+                  </Button>
+                </Stack>
+              </form>
             </Stack>
-          </form>
-        </Stack>
-      </Paper>
-    </Stack>
+          </Paper>
+        </Container>
+      </Box>
+    </>
   );
 }

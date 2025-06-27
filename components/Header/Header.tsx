@@ -208,8 +208,18 @@ export function Header() {
 
           <Group justify="center" grow pb="xl" px="md">
             <ColorSchemeToggle />
-            {/* TODO ELISA if the user is authenticated, show the user icon and menu */}
-            {session && <LogoutButton />}
+            {session ? (
+              <LogoutButton />
+            ) : (
+              <>
+                <Button variant="default" component={Link} href="/login">
+                  Log in
+                </Button>
+                <Button component={Link} href="/register">
+                  Sign up
+                </Button>
+              </>
+            )}
           </Group>
         </ScrollArea>
       </Drawer>
