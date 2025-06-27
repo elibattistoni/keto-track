@@ -165,7 +165,7 @@ export function Header() {
                   Log in
                 </Button>
                 <Button component={Link} href="/register">
-                  Sign up
+                  Register
                 </Button>
               </>
             )}
@@ -216,7 +216,7 @@ export function Header() {
                   Log in
                 </Button>
                 <Button component={Link} href="/register">
-                  Sign up
+                  Register
                 </Button>
               </>
             )}

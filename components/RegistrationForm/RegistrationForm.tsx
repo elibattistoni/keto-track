@@ -1,20 +1,23 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import IconAt from '@tabler/icons-react/dist/esm/icons/IconAt';
 import IconLock from '@tabler/icons-react/dist/esm/icons/IconLock';
 import { signIn } from 'next-auth/react';
 import {
   Alert,
+  Anchor,
   Box,
   Button,
   Container,
+  Divider,
+  Group,
   LoadingOverlay,
   Paper,
   PasswordInput,
   Stack,
-  Text,
   TextInput,
   Title,
 } from '@mantine/core';
@@ -22,6 +25,7 @@ import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
 import registerUser from '@/app/register/actions';
 import { messages } from '@/lib/messages';
 import { FormFields } from '@/types/registration';
+import { GoogleButton } from '../GoogleButton/GoogleButton';
 import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
 
 export function RegistrationForm() {
@@ -159,8 +163,14 @@ export function RegistrationForm() {
         <Container size="xs">
           <Paper shadow="md" p="xl" withBorder>
             <Stack>
-              <Title order={2}>Register</Title>
-              <Text size="sm">Create a new account</Text>
+              <Title order={2} ta="center">
+                Welcome to KetoTrack
+              </Title>
+              <Divider label="Register with" labelPosition="center" my="xs" />
+              <Group justify="center">
+                <GoogleButton radius="xl">Google</GoogleButton>
+              </Group>
+              <Divider label="Or continue with email" labelPosition="center" my="xs" />
               {/* action triggers the server action, which performs server side validation */}
               {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
               <form action={formAction} onSubmit={form.onSubmit(() => {})}>
@@ -205,10 +215,14 @@ export function RegistrationForm() {
                     leftSectionPointerEvents="none"
                     leftSection={iconLock}
                   />
-
-                  <Button type="submit" fullWidth disabled={isLoading} loading={isLoading} mt="md">
-                    Register
-                  </Button>
+                  <Group justify="space-between" mt="lg">
+                    <Anchor component={Link} href="/login" c="dimmed" size="xs">
+                      Already have an account? Login
+                    </Anchor>
+                    <Button type="submit" disabled={isLoading} loading={isLoading} radius="xl">
+                      Register
+                    </Button>
+                  </Group>
                 </Stack>
               </form>
             </Stack>

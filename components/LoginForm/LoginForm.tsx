@@ -1,12 +1,26 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { Alert, Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
+import {
+  Alert,
+  Anchor,
+  Button,
+  Container,
+  Divider,
+  Group,
+  Paper,
+  PasswordInput,
+  Stack,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
 import { messages } from '@/lib/messages';
+import { GoogleButton } from '../GoogleButton/GoogleButton';
 
-// TODO improve code
+// TODO improve code with LoadingOverlay & message
 
 export function LoginForm() {
   const [error, setError] = useState('');
@@ -48,13 +62,17 @@ export function LoginForm() {
   };
 
   return (
-    <Stack align="center" justify="center">
+    <Container size="xs">
       <Paper shadow="md" p="xl" withBorder>
         <Stack>
-          <Title order={2}>Login</Title>
-          <Text size="sm" c="dimmed">
-            Enter your credentials to access your account
-          </Text>
+          <Title order={2} ta="center">
+            Welcome to KetoTrack
+          </Title>
+          <Divider label="Login with" labelPosition="center" my="xs" />
+          <Group justify="center">
+            <GoogleButton radius="xl">Google</GoogleButton>
+          </Group>
+          <Divider label="Or continue with email" labelPosition="center" my="xs" />
           {/* TODO FORM: transform into server action */}
           <form onSubmit={handleSubmit}>
             <Stack>
@@ -77,13 +95,19 @@ export function LoginForm() {
                   {error}
                 </Alert>
               )}
-              <Button type="submit" loading={loading} fullWidth>
-                Login
-              </Button>
+
+              <Group justify="space-between" mt="lg">
+                <Anchor component={Link} href="/register" c="dimmed" size="xs">
+                  Don't have an account? Register
+                </Anchor>
+                <Button type="submit" radius="xl">
+                  Login
+                </Button>
+              </Group>
             </Stack>
           </form>
         </Stack>
       </Paper>
-    </Stack>
+    </Container>
   );
 }
