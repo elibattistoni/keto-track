@@ -17,8 +17,10 @@ import {
   Stack,
   TextInput,
   Title,
+  Transition,
 } from '@mantine/core';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
+import { useMounted } from '@mantine/hooks';
 import { messages } from '@/lib/messages';
 import { FormFields } from '@/types/registration';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
@@ -30,6 +32,8 @@ export function LoginForm() {
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<null | 'success' | 'error'>(null);
   const showOverlay = loading || !!message;
+
+  const mounted = useMounted();
 
   const form = useForm({
     initialValues: {
@@ -84,62 +88,66 @@ export function LoginForm() {
     };
 
   return (
-    <Container size="xs">
-      <LoadingOverlay
-        visible={showOverlay}
-        zIndex={1000}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{
-          children: message && (
-            <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
-              {message === 'error' ? messages.login.failed : messages.login.success}
-            </Alert>
-          ),
-        }}
-        styles={{ root: { width: '100vw', height: '100vh' } }}
-      />
-      <Paper shadow="md" p="xl" withBorder>
-        <Stack>
-          <Title order={2} ta="center">
-            Welcome to KetoTrack
-          </Title>
-          <Divider label="Login with" labelPosition="center" my="xs" />
-          <Group justify="center">
-            <GoogleButton radius="xl">Google</GoogleButton>
-          </Group>
-          <Divider label="Or continue with email" labelPosition="center" my="xs" />
-          {/* TODO FORM: transform into server action */}
-          <form onSubmit={handleSubmit}>
+    <Transition transition="scale" duration={2000} timingFunction="ease" mounted={mounted}>
+      {(styles) => (
+        <Container size="xs" style={styles}>
+          <LoadingOverlay
+            visible={showOverlay}
+            zIndex={1000}
+            overlayProps={{ radius: 'sm', blur: 2 }}
+            loaderProps={{
+              children: message && (
+                <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
+                  {message === 'error' ? messages.login.failed : messages.login.success}
+                </Alert>
+              ),
+            }}
+            styles={{ root: { width: '100vw', height: '100vh' } }}
+          />
+          <Paper shadow="md" p="xl" withBorder>
             <Stack>
-              <TextInput
-                label="Email"
-                placeholder="you@example.com"
-                withAsterisk
-                key={form.key('email')}
-                {...form.getInputProps('email')}
-                onChange={handleFieldChange('email')}
-              />
-              <PasswordInput
-                label="Password"
-                placeholder="Your password"
-                withAsterisk
-                key={form.key('password')}
-                {...form.getInputProps('password')}
-                onChange={handleFieldChange('password')}
-              />
-
-              <Group justify="space-between" mt="lg">
-                <Anchor component={Link} href="/register" c="dimmed" size="xs">
-                  Don't have an account? Register
-                </Anchor>
-                <Button type="submit" radius="xl" disabled={loading} loading={loading}>
-                  Login
-                </Button>
+              <Title order={2} ta="center">
+                Welcome to KetoTrack
+              </Title>
+              <Divider label="Login with" labelPosition="center" my="xs" />
+              <Group justify="center">
+                <GoogleButton radius="xl">Google</GoogleButton>
               </Group>
+              <Divider label="Or continue with email" labelPosition="center" my="xs" />
+              {/* TODO FORM: transform into server action */}
+              <form onSubmit={handleSubmit}>
+                <Stack>
+                  <TextInput
+                    label="Email"
+                    placeholder="you@example.com"
+                    withAsterisk
+                    key={form.key('email')}
+                    {...form.getInputProps('email')}
+                    onChange={handleFieldChange('email')}
+                  />
+                  <PasswordInput
+                    label="Password"
+                    placeholder="Your password"
+                    withAsterisk
+                    key={form.key('password')}
+                    {...form.getInputProps('password')}
+                    onChange={handleFieldChange('password')}
+                  />
+
+                  <Group justify="space-between" mt="lg">
+                    <Anchor component={Link} href="/register" c="dimmed" size="xs">
+                      Don't have an account? Register
+                    </Anchor>
+                    <Button type="submit" radius="xl" disabled={loading} loading={loading}>
+                      Login
+                    </Button>
+                  </Group>
+                </Stack>
+              </form>
             </Stack>
-          </form>
-        </Stack>
-      </Paper>
-    </Container>
+          </Paper>
+        </Container>
+      )}
+    </Transition>
   );
 }

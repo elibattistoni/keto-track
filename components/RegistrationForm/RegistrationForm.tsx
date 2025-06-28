@@ -19,8 +19,10 @@ import {
   Stack,
   TextInput,
   Title,
+  Transition,
 } from '@mantine/core';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
+import { useMounted } from '@mantine/hooks';
 import registerUser from '@/app/(authentication)/register/actions';
 import { messages } from '@/lib/messages';
 import { FormFields } from '@/types/registration';
@@ -29,6 +31,7 @@ import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
 
 export function RegistrationForm() {
   const router = useRouter();
+  const mounted = useMounted();
 
   const [state, formAction, isPending] = useActionState(registerUser, {
     success: null,
@@ -140,86 +143,90 @@ export function RegistrationForm() {
     };
 
   return (
-    <Container size="xs">
-      <LoadingOverlay
-        visible={showOverlay}
-        zIndex={1000}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{
-          children: message && (
-            <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
-              {message === 'error' ? state?.error?.general : state?.success}
-            </Alert>
-          ),
-        }}
-        styles={{ root: { width: '100vw', height: '100vh' } }}
-      />
-      <Paper shadow="md" p="xl" withBorder>
-        <Stack>
-          <Title order={2} ta="center">
-            Welcome to KetoTrack
-          </Title>
-          <Divider label="Register with" labelPosition="center" my="xs" />
-          <Group justify="center">
-            <GoogleButton radius="xl">Google</GoogleButton>
-          </Group>
-          <Divider label="Or continue with email" labelPosition="center" my="xs" />
-          {/* action triggers the server action, which performs server side validation */}
-          {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
-          <form action={formAction} onSubmit={form.onSubmit(() => {})}>
+    <Transition transition="scale-y" duration={1000} timingFunction="ease" mounted={mounted}>
+      {(styles) => (
+        <Container size="xs" style={styles}>
+          <LoadingOverlay
+            visible={showOverlay}
+            zIndex={1000}
+            overlayProps={{ radius: 'sm', blur: 2 }}
+            loaderProps={{
+              children: message && (
+                <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
+                  {message === 'error' ? state?.error?.general : state?.success}
+                </Alert>
+              ),
+            }}
+            styles={{ root: { width: '100vw', height: '100vh' } }}
+          />
+          <Paper shadow="md" p="xl" withBorder>
             <Stack>
-              <TextInput
-                label="Name"
-                placeholder="Your name"
-                {...form.getInputProps('name')}
-                withAsterisk
-                name="name"
-                type="text"
-                onChange={handleFieldChange('name')}
-              />
-              <TextInput
-                label="Email"
-                placeholder="you@example.com"
-                {...form.getInputProps('email')}
-                withAsterisk
-                name="email"
-                type="email"
-                onChange={handleFieldChange('email')}
-                leftSectionPointerEvents="none"
-                leftSection={iconAt}
-              />
-              <StrengthMeterPasswordInput
-                label="Password"
-                placeholder="Your password"
-                {...form.getInputProps('password')}
-                withAsterisk
-                name="password"
-                onChange={handleFieldChange('password')}
-                leftSectionPointerEvents="none"
-                leftSection={iconLock}
-              />
-              <PasswordInput
-                label="Confirm Password"
-                placeholder="Repeat your password"
-                {...form.getInputProps('confirmPassword')}
-                withAsterisk
-                name="confirmPassword"
-                onChange={handleFieldChange('confirmPassword')}
-                leftSectionPointerEvents="none"
-                leftSection={iconLock}
-              />
-              <Group justify="space-between" mt="lg">
-                <Anchor component={Link} href="/login" c="dimmed" size="xs">
-                  Already have an account? Login
-                </Anchor>
-                <Button type="submit" disabled={isLoading} loading={isLoading} radius="xl">
-                  Register
-                </Button>
+              <Title order={2} ta="center">
+                Welcome to KetoTrack
+              </Title>
+              <Divider label="Register with" labelPosition="center" my="xs" />
+              <Group justify="center">
+                <GoogleButton radius="xl">Google</GoogleButton>
               </Group>
+              <Divider label="Or continue with email" labelPosition="center" my="xs" />
+              {/* action triggers the server action, which performs server side validation */}
+              {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
+              <form action={formAction} onSubmit={form.onSubmit(() => {})}>
+                <Stack>
+                  <TextInput
+                    label="Name"
+                    placeholder="Your name"
+                    {...form.getInputProps('name')}
+                    withAsterisk
+                    name="name"
+                    type="text"
+                    onChange={handleFieldChange('name')}
+                  />
+                  <TextInput
+                    label="Email"
+                    placeholder="you@example.com"
+                    {...form.getInputProps('email')}
+                    withAsterisk
+                    name="email"
+                    type="email"
+                    onChange={handleFieldChange('email')}
+                    leftSectionPointerEvents="none"
+                    leftSection={iconAt}
+                  />
+                  <StrengthMeterPasswordInput
+                    label="Password"
+                    placeholder="Your password"
+                    {...form.getInputProps('password')}
+                    withAsterisk
+                    name="password"
+                    onChange={handleFieldChange('password')}
+                    leftSectionPointerEvents="none"
+                    leftSection={iconLock}
+                  />
+                  <PasswordInput
+                    label="Confirm Password"
+                    placeholder="Repeat your password"
+                    {...form.getInputProps('confirmPassword')}
+                    withAsterisk
+                    name="confirmPassword"
+                    onChange={handleFieldChange('confirmPassword')}
+                    leftSectionPointerEvents="none"
+                    leftSection={iconLock}
+                  />
+                  <Group justify="space-between" mt="lg">
+                    <Anchor component={Link} href="/login" c="dimmed" size="xs">
+                      Already have an account? Login
+                    </Anchor>
+                    <Button type="submit" disabled={isLoading} loading={isLoading} radius="xl">
+                      Register
+                    </Button>
+                  </Group>
+                </Stack>
+              </form>
             </Stack>
-          </form>
-        </Stack>
-      </Paper>
-    </Container>
+          </Paper>
+        </Container>
+      )}
+    </Transition>
   );
 }
