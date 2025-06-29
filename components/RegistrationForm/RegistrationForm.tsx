@@ -16,16 +16,17 @@ import {
   LoadingOverlay,
   Paper,
   PasswordInput,
+  Portal,
   Stack,
   TextInput,
   Title,
   Transition,
 } from '@mantine/core';
-import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
 import { useMounted } from '@mantine/hooks';
 import registerUser from '@/app/(authentication)/register/actions';
 import { messages } from '@/lib/messages';
-import { FormFields } from '@/types/registration';
+import { RegisterFormFields } from '@/types/registration';
+import { useRegisterForm } from '../AuthenticationForm/use-register-form';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
 import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
 
@@ -47,31 +48,7 @@ export function RegistrationForm() {
   const iconAt = <IconAt size={16} />;
   const iconLock = <IconLock size={18} stroke={1.5} />;
 
-  const form = useForm<FormFields>({
-    initialValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
-    validate: {
-      name: (value) =>
-        isNotEmpty(messages.registration.nameRequired)(value) ||
-        hasLength({ min: 3 }, messages.registration.nameTooShort)(value),
-      email: (value) =>
-        isNotEmpty(messages.registration.emailRequired)(value) ||
-        isEmail(messages.registration.invalidEmail)(value),
-      password: (value) =>
-        isNotEmpty(messages.registration.passwordRequired)(value) ||
-        hasLength({ min: 6 }, messages.registration.passwordTooShort)(value),
-      confirmPassword: (value, values) =>
-        isNotEmpty(messages.registration.confirmPasswordRequired)(value) ||
-        (value !== values.password ? messages.registration.passwordsDoNotMatch : null),
-    },
-    // validateInputOnChange: true,
-    validateInputOnBlur: true,
-    onSubmitPreventDefault: 'validation-failed',
-  });
+  const form = useRegisterForm();
 
   // this keeps in sync the state errors (from the server action) with the form errors (from Mantine useForm)
   useEffect(() => {
@@ -135,7 +112,7 @@ export function RegistrationForm() {
   // so we clear the error for that field when the user starts typing
   // this is a workaround, as Mantine's useForm does not provide a way to clear errors on field change directly.
   const handleFieldChange =
-    (field: keyof FormFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof RegisterFormFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
       // update form value (needed because with the onChange handler, Mantine's useForm does not update the value automatically)
       form.setFieldValue(field, event.currentTarget.value);
       // clear error for that field
@@ -143,90 +120,93 @@ export function RegistrationForm() {
     };
 
   return (
-    <Transition transition="scale-y" duration={1000} timingFunction="ease" mounted={mounted}>
-      {(styles) => (
-        <Container size="xs" style={styles}>
-          <LoadingOverlay
-            visible={showOverlay}
-            zIndex={1000}
-            overlayProps={{ radius: 'sm', blur: 2 }}
-            loaderProps={{
-              children: message && (
-                <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
-                  {message === 'error' ? state?.error?.general : state?.success}
-                </Alert>
-              ),
-            }}
-            styles={{ root: { width: '100vw', height: '100vh' } }}
-          />
-          <Paper shadow="md" p="xl" withBorder>
-            <Stack>
-              <Title order={2} ta="center">
-                Welcome to KetoTrack
-              </Title>
-              <Divider label="Register with" labelPosition="center" my="xs" />
-              <Group justify="center">
-                <GoogleButton radius="xl">Google</GoogleButton>
-              </Group>
-              <Divider label="Or continue with email" labelPosition="center" my="xs" />
-              {/* action triggers the server action, which performs server side validation */}
-              {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
-              <form action={formAction} onSubmit={form.onSubmit(() => {})}>
-                <Stack>
-                  <TextInput
-                    label="Name"
-                    placeholder="Your name"
-                    {...form.getInputProps('name')}
-                    withAsterisk
-                    name="name"
-                    type="text"
-                    onChange={handleFieldChange('name')}
-                  />
-                  <TextInput
-                    label="Email"
-                    placeholder="you@example.com"
-                    {...form.getInputProps('email')}
-                    withAsterisk
-                    name="email"
-                    type="email"
-                    onChange={handleFieldChange('email')}
-                    leftSectionPointerEvents="none"
-                    leftSection={iconAt}
-                  />
-                  <StrengthMeterPasswordInput
-                    label="Password"
-                    placeholder="Your password"
-                    {...form.getInputProps('password')}
-                    withAsterisk
-                    name="password"
-                    onChange={handleFieldChange('password')}
-                    leftSectionPointerEvents="none"
-                    leftSection={iconLock}
-                  />
-                  <PasswordInput
-                    label="Confirm Password"
-                    placeholder="Repeat your password"
-                    {...form.getInputProps('confirmPassword')}
-                    withAsterisk
-                    name="confirmPassword"
-                    onChange={handleFieldChange('confirmPassword')}
-                    leftSectionPointerEvents="none"
-                    leftSection={iconLock}
-                  />
-                  <Group justify="space-between" mt="lg">
-                    <Anchor component={Link} href="/login" c="dimmed" size="xs">
-                      Already have an account? Login
-                    </Anchor>
-                    <Button type="submit" disabled={isLoading} loading={isLoading} radius="xl">
-                      Register
-                    </Button>
-                  </Group>
-                </Stack>
-              </form>
-            </Stack>
-          </Paper>
-        </Container>
-      )}
-    </Transition>
+    <>
+      <Portal>
+        <LoadingOverlay
+          visible={showOverlay}
+          zIndex={1000}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{
+            children: message && (
+              <Alert color={message === 'error' ? 'red' : 'green'} mt="500px">
+                {message === 'error' ? messages.login.failed : messages.login.success}
+              </Alert>
+            ),
+          }}
+        />
+      </Portal>
+      <Transition transition="scale-y" duration={1000} timingFunction="ease" mounted={mounted}>
+        {(styles) => (
+          <Container size="xs" style={styles}>
+            <Paper shadow="md" p="xl" withBorder>
+              <Stack>
+                <Title order={2} ta="center">
+                  Welcome to KetoTrack
+                </Title>
+                <Divider label="Register with" labelPosition="center" my="xs" />
+                <Group justify="center">
+                  <GoogleButton radius="xl">Google</GoogleButton>
+                </Group>
+                <Divider label="Or continue with email" labelPosition="center" my="xs" />
+                {/* action triggers the server action, which performs server side validation */}
+                {/* onSubmit triggers the mantine useForm validate function, which performs client side validation */}
+                <form action={formAction} onSubmit={form.onSubmit(() => {})}>
+                  <Stack>
+                    <TextInput
+                      label="Name"
+                      placeholder="Your name"
+                      {...form.getInputProps('name')}
+                      withAsterisk
+                      name="name"
+                      type="text"
+                      onChange={handleFieldChange('name')}
+                    />
+                    <TextInput
+                      label="Email"
+                      placeholder="you@example.com"
+                      {...form.getInputProps('email')}
+                      withAsterisk
+                      name="email"
+                      type="email"
+                      onChange={handleFieldChange('email')}
+                      leftSectionPointerEvents="none"
+                      leftSection={iconAt}
+                    />
+                    <StrengthMeterPasswordInput
+                      label="Password"
+                      placeholder="Your password"
+                      {...form.getInputProps('password')}
+                      withAsterisk
+                      name="password"
+                      onChange={handleFieldChange('password')}
+                      leftSectionPointerEvents="none"
+                      leftSection={iconLock}
+                    />
+                    <PasswordInput
+                      label="Confirm Password"
+                      placeholder="Repeat your password"
+                      {...form.getInputProps('confirmPassword')}
+                      withAsterisk
+                      name="confirmPassword"
+                      onChange={handleFieldChange('confirmPassword')}
+                      leftSectionPointerEvents="none"
+                      leftSection={iconLock}
+                    />
+                    <Group justify="space-between" mt="lg">
+                      <Anchor component={Link} href="/login" c="dimmed" size="xs">
+                        Already have an account? Login
+                      </Anchor>
+                      <Button type="submit" disabled={isLoading} loading={isLoading} radius="xl">
+                        Register
+                      </Button>
+                    </Group>
+                  </Stack>
+                </form>
+              </Stack>
+            </Paper>
+          </Container>
+        )}
+      </Transition>
+    </>
   );
 }

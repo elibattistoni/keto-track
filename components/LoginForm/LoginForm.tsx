@@ -7,6 +7,7 @@ import { signIn } from 'next-auth/react';
 import {
   Alert,
   Anchor,
+  Box,
   Button,
   Container,
   Divider,
@@ -14,16 +15,18 @@ import {
   LoadingOverlay,
   Paper,
   PasswordInput,
+  Portal,
   Stack,
   TextInput,
   Title,
   Transition,
 } from '@mantine/core';
-import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
 import { useMounted } from '@mantine/hooks';
 import { messages } from '@/lib/messages';
-import { FormFields } from '@/types/registration';
+import { LoginFormFields } from '@/types/registration';
+import { useLoginForm } from '../AuthenticationForm/use-login-form';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
+import { KetoTrack } from '../KetoTrack/KetoTrack';
 
 // TODO improve code with LoadingOverlay & message
 
@@ -35,21 +38,7 @@ export function LoginForm() {
 
   const mounted = useMounted();
 
-  const form = useForm({
-    initialValues: {
-      email: '',
-      password: '',
-    },
-    validate: {
-      email: (value) =>
-        isNotEmpty(messages.login.emailRequired)(value) ||
-        isEmail(messages.login.invalidEmail)(value),
-      password: (value) =>
-        isNotEmpty(messages.login.passwordRequired)(value) ||
-        hasLength({ min: 6 }, messages.login.passwordTooShort)(value),
-    },
-    validateInputOnBlur: true,
-  });
+  const form = useLoginForm();
 
   useEffect(() => {
     if (message && !loading) {
@@ -82,72 +71,88 @@ export function LoginForm() {
   };
 
   const handleFieldChange =
-    (field: keyof Partial<FormFields>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof LoginFormFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
       form.setFieldValue(field, event.currentTarget.value);
       form.clearFieldError(field);
     };
 
   return (
-    <Transition transition="scale" duration={2000} timingFunction="ease" mounted={mounted}>
-      {(styles) => (
-        <Container size="xs" style={styles}>
-          <LoadingOverlay
-            visible={showOverlay}
-            zIndex={1000}
-            overlayProps={{ radius: 'sm', blur: 2 }}
-            loaderProps={{
-              children: message && (
-                <Alert color={message === 'error' ? 'red' : 'green'} variant="light">
-                  {message === 'error' ? messages.login.failed : messages.login.success}
-                </Alert>
-              ),
-            }}
-            styles={{ root: { width: '100vw', height: '100vh' } }}
-          />
-          <Paper shadow="md" p="xl" withBorder>
-            <Stack>
-              <Title order={2} ta="center">
-                Welcome to KetoTrack
-              </Title>
-              <Divider label="Login with" labelPosition="center" my="xs" />
-              <Group justify="center">
-                <GoogleButton radius="xl">Google</GoogleButton>
-              </Group>
-              <Divider label="Or continue with email" labelPosition="center" my="xs" />
-              {/* TODO FORM: transform into server action */}
-              <form onSubmit={handleSubmit}>
+    <>
+      <Portal>
+        <LoadingOverlay
+          visible={showOverlay}
+          zIndex={1000}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{
+            children: message && (
+              <Alert color={message === 'error' ? 'red' : 'green'} mt="500px">
+                {message === 'error' ? messages.login.failed : messages.login.success}
+              </Alert>
+            ),
+          }}
+        />
+      </Portal>
+      <Box
+        style={{
+          width: '100vw',
+          height: '100vh',
+          background:
+            'linear-gradient(70deg,rgba(173, 134, 221, 1) 40%, rgba(122, 234, 159, 0.75) 100%)',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          paddingTop: '100px',
+        }}
+      >
+        <Transition transition="fade" duration={3000} timingFunction="ease" mounted={mounted}>
+          {(styles) => (
+            <Container size="xs" style={styles}>
+              <Paper shadow="md" p="xl" withBorder>
                 <Stack>
-                  <TextInput
-                    label="Email"
-                    placeholder="you@example.com"
-                    withAsterisk
-                    key={form.key('email')}
-                    {...form.getInputProps('email')}
-                    onChange={handleFieldChange('email')}
-                  />
-                  <PasswordInput
-                    label="Password"
-                    placeholder="Your password"
-                    withAsterisk
-                    key={form.key('password')}
-                    {...form.getInputProps('password')}
-                    onChange={handleFieldChange('password')}
-                  />
-
-                  <Group justify="space-between" mt="lg">
-                    <Anchor component={Link} href="/register" c="dimmed" size="xs">
-                      Don't have an account? Register
-                    </Anchor>
-                    <Button type="submit" radius="xl" disabled={loading} loading={loading}>
-                      Login
-                    </Button>
+                  <Title order={2} ta="center">
+                    Welcome to <KetoTrack />
+                  </Title>
+                  <Divider label="Login with" labelPosition="center" my="xs" />
+                  <Group justify="center">
+                    <GoogleButton radius="xl">Google</GoogleButton>
                   </Group>
+                  <Divider label="Or continue with email" labelPosition="center" my="xs" />
+                  {/* TODO FORM: transform into server action */}
+                  <form onSubmit={handleSubmit}>
+                    <Stack>
+                      <TextInput
+                        label="Email"
+                        placeholder="you@example.com"
+                        withAsterisk
+                        key={form.key('email')}
+                        {...form.getInputProps('email')}
+                        onChange={handleFieldChange('email')}
+                      />
+                      <PasswordInput
+                        label="Password"
+                        placeholder="Your password"
+                        withAsterisk
+                        key={form.key('password')}
+                        {...form.getInputProps('password')}
+                        onChange={handleFieldChange('password')}
+                      />
+
+                      <Group justify="space-between" mt="lg">
+                        <Anchor component={Link} href="/register" c="dimmed" size="xs">
+                          Don't have an account? Register
+                        </Anchor>
+                        <Button type="submit" radius="xl" disabled={loading} loading={loading}>
+                          Login
+                        </Button>
+                      </Group>
+                    </Stack>
+                  </form>
                 </Stack>
-              </form>
-            </Stack>
-          </Paper>
-        </Container>
-      )}
-    </Transition>
+              </Paper>
+            </Container>
+          )}
+        </Transition>
+      </Box>
+    </>
   );
 }
