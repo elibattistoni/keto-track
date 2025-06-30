@@ -7,7 +7,6 @@ import { signIn } from 'next-auth/react';
 import {
   Alert,
   Anchor,
-  Box,
   Button,
   Container,
   Divider,
@@ -24,7 +23,8 @@ import {
 import { useMounted } from '@mantine/hooks';
 import { messages } from '@/lib/messages';
 import { LoginFormFields } from '@/types/registration';
-import { useLoginForm } from '../AuthenticationForm/use-login-form';
+import { useLoginForm } from '../../hooks/auth/use-login-form';
+import { AnimatedBackground } from '../AnimatedBackground/AnimatedBackground';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
 import { KetoTrack } from '../KetoTrack/KetoTrack';
 
@@ -78,6 +78,7 @@ export function LoginForm() {
 
   return (
     <>
+      <AnimatedBackground />
       <Portal>
         <LoadingOverlay
           visible={showOverlay}
@@ -92,67 +93,55 @@ export function LoginForm() {
           }}
         />
       </Portal>
-      <Box
-        style={{
-          width: '100vw',
-          height: '100vh',
-          background:
-            'linear-gradient(70deg,rgba(173, 134, 221, 1) 40%, rgba(122, 234, 159, 0.75) 100%)',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          paddingTop: '100px',
-        }}
-      >
-        <Transition transition="fade" duration={3000} timingFunction="ease" mounted={mounted}>
-          {(styles) => (
-            <Container size="xs" style={styles}>
-              <Paper shadow="md" p="xl" withBorder>
-                <Stack>
-                  <Title order={2} ta="center">
-                    Welcome to <KetoTrack />
-                  </Title>
-                  <Divider label="Login with" labelPosition="center" my="xs" />
-                  <Group justify="center">
-                    <GoogleButton radius="xl">Google</GoogleButton>
-                  </Group>
-                  <Divider label="Or continue with email" labelPosition="center" my="xs" />
-                  {/* TODO FORM: transform into server action */}
-                  <form onSubmit={handleSubmit}>
-                    <Stack>
-                      <TextInput
-                        label="Email"
-                        placeholder="you@example.com"
-                        withAsterisk
-                        key={form.key('email')}
-                        {...form.getInputProps('email')}
-                        onChange={handleFieldChange('email')}
-                      />
-                      <PasswordInput
-                        label="Password"
-                        placeholder="Your password"
-                        withAsterisk
-                        key={form.key('password')}
-                        {...form.getInputProps('password')}
-                        onChange={handleFieldChange('password')}
-                      />
 
-                      <Group justify="space-between" mt="lg">
-                        <Anchor component={Link} href="/register" c="dimmed" size="xs">
-                          Don't have an account? Register
-                        </Anchor>
-                        <Button type="submit" radius="xl" disabled={loading} loading={loading}>
-                          Login
-                        </Button>
-                      </Group>
-                    </Stack>
-                  </form>
-                </Stack>
-              </Paper>
-            </Container>
-          )}
-        </Transition>
-      </Box>
+      <Transition transition="fade" duration={1000} timingFunction="ease" mounted={mounted}>
+        {(styles) => (
+          <Container size="xs" style={styles}>
+            <Paper shadow="md" p="xl" withBorder radius="md">
+              <Stack>
+                <Title order={2} ta="center">
+                  Welcome to <KetoTrack />
+                </Title>
+                <Divider label="Login with" labelPosition="center" my="xs" />
+                <Group justify="center">
+                  <GoogleButton radius="xl">Google</GoogleButton>
+                </Group>
+                <Divider label="Or continue with email" labelPosition="center" my="xs" />
+                {/* TODO FORM: transform into server action */}
+                <form onSubmit={handleSubmit}>
+                  <Stack>
+                    <TextInput
+                      label="Email"
+                      placeholder="you@example.com"
+                      withAsterisk
+                      key={form.key('email')}
+                      {...form.getInputProps('email')}
+                      onChange={handleFieldChange('email')}
+                    />
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Your password"
+                      withAsterisk
+                      key={form.key('password')}
+                      {...form.getInputProps('password')}
+                      onChange={handleFieldChange('password')}
+                    />
+
+                    <Group justify="space-between" mt="lg">
+                      <Anchor component={Link} href="/register" c="dimmed" size="xs">
+                        Don't have an account? Register
+                      </Anchor>
+                      <Button type="submit" radius="xl" disabled={loading} loading={loading}>
+                        Login
+                      </Button>
+                    </Group>
+                  </Stack>
+                </form>
+              </Stack>
+            </Paper>
+          </Container>
+        )}
+      </Transition>
     </>
   );
 }

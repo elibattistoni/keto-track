@@ -23,11 +23,13 @@ import {
   Transition,
 } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
-import registerUser from '@/app/(authentication)/register/actions';
+import registerUser from '@/actions/auth/registerUser';
 import { messages } from '@/lib/messages';
-import { RegisterFormFields } from '@/types/registration';
-import { useRegisterForm } from '../AuthenticationForm/use-register-form';
+import { RegistrationFormFields } from '@/types/registration';
+import { useRegisterForm } from '../../hooks/auth/use-register-form';
+import { AnimatedBackground } from '../AnimatedBackground/AnimatedBackground';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
+import { KetoTrack } from '../KetoTrack/KetoTrack';
 import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
 
 export function RegistrationForm() {
@@ -112,7 +114,7 @@ export function RegistrationForm() {
   // so we clear the error for that field when the user starts typing
   // this is a workaround, as Mantine's useForm does not provide a way to clear errors on field change directly.
   const handleFieldChange =
-    (field: keyof RegisterFormFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof RegistrationFormFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
       // update form value (needed because with the onChange handler, Mantine's useForm does not update the value automatically)
       form.setFieldValue(field, event.currentTarget.value);
       // clear error for that field
@@ -121,6 +123,7 @@ export function RegistrationForm() {
 
   return (
     <>
+      <AnimatedBackground />
       <Portal>
         <LoadingOverlay
           visible={showOverlay}
@@ -135,13 +138,13 @@ export function RegistrationForm() {
           }}
         />
       </Portal>
-      <Transition transition="scale-y" duration={1000} timingFunction="ease" mounted={mounted}>
+      <Transition transition="fade" duration={1000} timingFunction="ease" mounted={mounted}>
         {(styles) => (
           <Container size="xs" style={styles}>
-            <Paper shadow="md" p="xl" withBorder>
+            <Paper shadow="md" p="xl" withBorder radius="md">
               <Stack>
                 <Title order={2} ta="center">
-                  Welcome to KetoTrack
+                  Welcome to <KetoTrack />
                 </Title>
                 <Divider label="Register with" labelPosition="center" my="xs" />
                 <Group justify="center">

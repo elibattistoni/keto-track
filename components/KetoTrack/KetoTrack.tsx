@@ -1,17 +1,10 @@
-'use client';
-
-import { Text, useMantineTheme } from '@mantine/core';
+import { Text } from '@mantine/core';
 
 export function KetoTrack() {
-  const theme = useMantineTheme();
   return (
-    <Text
-      inherit
-      variant="gradient"
-      component="span"
-      gradient={{ from: theme.colors.brandViolet[4], to: theme.colors.brandGreen[4] }}
-    >
-      KetoTrack
+    <Text inherit component="span">
+      <span style={{ color: 'var(--mantine-color-brandViolet-4)' }}>Keto</span>
+      <span style={{ color: 'var(--mantine-color-brandGreen-4)' }}>Track</span>
     </Text>
   );
 }

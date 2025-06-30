@@ -1,5 +1,5 @@
-export { AuthenticationForm } from '@/components/AuthenticationForm/AuthenticationForm';
 export { AffixMenu } from './AffixMenu/AffixMenu';
+export { AnimatedBackground } from './AnimatedBackground/AnimatedBackground';
 export { GoogleButton } from './GoogleButton/GoogleButton';
 export { Header } from './Header/Header';
 export { KetoTrack } from './KetoTrack/KetoTrack';

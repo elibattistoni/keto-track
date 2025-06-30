@@ -166,17 +166,17 @@ Your registration implementation is **very solid and aligns well with modern bes
 
 ### ✅ What’s Good About Your Registration Flow
 
-| Practice                          | Your Implementation                                                | Why it’s Good                      |
-| :-------------------------------- | :----------------------------------------------------------------- | :--------------------------------- |
-| **Separation of concerns**        | Registration is handled separately from authentication (next-auth) | Keeps code maintainable and clear  |
-| **Server-side validation**        | Uses Zod schema in `registerUserLogic`                             | Ensures only valid data is stored  |
-| **Client-side validation**        | Uses Mantine’s form validation                                     | Gives instant feedback to the user |
-| **Password hashing**              | Uses bcrypt before storing in DB                                   | Secure, industry standard          |
-| **No duplicate emails**           | Checks for existing user before creating                           | Prevents account collisions        |
-| **Shared logic**                  | `registerUserLogic` is reused between server action and API route  | DRY, easy to maintain              |
-| **API route for mobile/external** | `/api/register/route.ts`                                           | Enables future flexibility         |
-| **Good error handling**           | Returns structured errors for both validation and system errors    | UX and debugging friendly          |
-| **No sensitive data leak**        | No password or sensitive info sent to the client                   | Secure                             |
+| Practice                          | Your Implementation                                                   | Why it’s Good                      |
+| :-------------------------------- | :-------------------------------------------------------------------- | :--------------------------------- |
+| **Separation of concerns**        | Registration is handled separately from authentication (next-auth)    | Keeps code maintainable and clear  |
+| **Server-side validation**        | Uses Zod schema in `userRegistrationLogic`                            | Ensures only valid data is stored  |
+| **Client-side validation**        | Uses Mantine’s form validation                                        | Gives instant feedback to the user |
+| **Password hashing**              | Uses bcrypt before storing in DB                                      | Secure, industry standard          |
+| **No duplicate emails**           | Checks for existing user before creating                              | Prevents account collisions        |
+| **Shared logic**                  | `userRegistrationLogic` is reused between server action and API route | DRY, easy to maintain              |
+| **API route for mobile/external** | `/api/register/route.ts`                                              | Enables future flexibility         |
+| **Good error handling**           | Returns structured errors for both validation and system errors       | UX and debugging friendly          |
+| **No sensitive data leak**        | No password or sensitive info sent to the client                      | Secure                             |
 
 ---
 

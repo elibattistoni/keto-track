@@ -4,7 +4,11 @@
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { FormFields, RegisterUserResponse, RegistrationFormError } from '@/types/registration';
+import {
+  RegisterUserResponse,
+  RegistrationFormError,
+  RegistrationFormFields,
+} from '@/types/registration';
 import { messages } from '../messages';
 
 const RegisterSchema = z
@@ -19,7 +23,9 @@ const RegisterSchema = z
     path: ['confirmPassword'],
   });
 
-export async function registerUserLogic(input: FormFields): Promise<RegisterUserResponse> {
+export async function userRegistrationLogic(
+  input: RegistrationFormFields
+): Promise<RegisterUserResponse> {
   const error: RegistrationFormError = {
     name: null,
     email: null,

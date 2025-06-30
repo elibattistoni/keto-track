@@ -1,9 +1,9 @@
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
 import { messages } from '@/lib/messages';
-import { RegisterFormFields } from '@/types/registration';
+import { RegistrationFormFields } from '@/types/registration';
 
 export function useRegisterForm() {
-  return useForm<RegisterFormFields>({
+  return useForm<RegistrationFormFields>({
     initialValues: {
       name: '',
       email: '',
@@ -29,5 +29,3 @@ export function useRegisterForm() {
     onSubmitPreventDefault: 'validation-failed',
   });
 }
-
-// TODO ELISA delete this? and use useAuthForm?

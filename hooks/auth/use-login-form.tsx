@@ -19,5 +19,3 @@ export function useLoginForm() {
     validateInputOnBlur: true,
   });
 }
-
-// TODO ELISA delete this? and use useAuthForm?
