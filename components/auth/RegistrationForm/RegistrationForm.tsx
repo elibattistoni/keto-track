@@ -26,10 +26,10 @@ import { useMounted } from '@mantine/hooks';
 import registerUser from '@/actions/auth/registerUser';
 import { messages } from '@/lib/messages';
 import { RegistrationFormFields } from '@/types/registration';
-import { useRegisterForm } from '../../hooks/auth/use-register-form';
-import { AnimatedBackground } from '../AnimatedBackground/AnimatedBackground';
+import { useRegisterForm } from '../../../hooks/auth/use-register-form';
+import { AnimatedBackground } from '../../layout/AnimatedBackground/AnimatedBackground';
+import { KetoTrack } from '../../layout/KetoTrack/KetoTrack';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
-import { KetoTrack } from '../KetoTrack/KetoTrack';
 import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
 
 export function RegistrationForm() {
@@ -132,7 +132,7 @@ export function RegistrationForm() {
           loaderProps={{
             children: message && (
               <Alert color={message === 'error' ? 'red' : 'green'} mt="500px">
-                {message === 'error' ? messages.login.failed : messages.login.success}
+                {message === 'error' ? messages.registration.failed : messages.registration.success}
               </Alert>
             ),
           }}

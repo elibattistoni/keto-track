@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: null,
-        error: { general: messages.register.failed },
+        error: { general: messages.registration.failed },
       },
       {
         status: 500,

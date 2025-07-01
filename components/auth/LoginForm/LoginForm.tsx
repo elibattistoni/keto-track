@@ -23,10 +23,10 @@ import {
 import { useMounted } from '@mantine/hooks';
 import { messages } from '@/lib/messages';
 import { LoginFormFields } from '@/types/registration';
-import { useLoginForm } from '../../hooks/auth/use-login-form';
-import { AnimatedBackground } from '../AnimatedBackground/AnimatedBackground';
+import { useLoginForm } from '../../../hooks/auth/use-login-form';
+import { AnimatedBackground } from '../../layout/AnimatedBackground/AnimatedBackground';
+import { KetoTrack } from '../../layout/KetoTrack/KetoTrack';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
-import { KetoTrack } from '../KetoTrack/KetoTrack';
 
 // TODO improve code with LoadingOverlay & message
 

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
-import { RegistrationForm } from '@/components';
+import { RegistrationForm } from '@/components/auth';
 import { authOptions } from '../../api/auth/[...nextauth]/route';
 
 export default async function RegisterPage() {

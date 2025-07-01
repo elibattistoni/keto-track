@@ -1,4 +1,4 @@
-import { Welcome } from '@/components';
+import { Welcome } from '@/components/layout';
 import { prisma } from '@/lib/prisma';
 
 export default async function HomePage() {

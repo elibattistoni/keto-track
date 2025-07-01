@@ -1,10 +1,11 @@
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
-import { AffixMenu, Header, NextAuthSessionProvider } from '@/components';
 import { theme } from '@/theme';
 
 import '@mantine/core/styles.css';
 
 import { ReactNode } from 'react';
+import { NextAuthSessionProvider } from '@/components/auth';
+import { AffixMenu, Header } from '@/components/layout';
 
 export const metadata = {
   title: 'Keto Track App',

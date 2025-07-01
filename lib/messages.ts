@@ -1,5 +1,5 @@
 export const messages = {
-  register: {
+  registration: {
     success: 'Registration successful! Logging you in...',
     failed: 'Registration failed. Please try again.',
     emailRequired: 'Email is required',

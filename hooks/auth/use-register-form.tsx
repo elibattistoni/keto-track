@@ -12,17 +12,17 @@ export function useRegisterForm() {
     },
     validate: {
       name: (value) =>
-        isNotEmpty(messages.register.nameRequired)(value) ||
-        hasLength({ min: 3 }, messages.register.nameTooShort)(value),
+        isNotEmpty(messages.registration.nameRequired)(value) ||
+        hasLength({ min: 3 }, messages.registration.nameTooShort)(value),
       email: (value) =>
-        isNotEmpty(messages.register.emailRequired)(value) ||
-        isEmail(messages.register.invalidEmail)(value),
+        isNotEmpty(messages.registration.emailRequired)(value) ||
+        isEmail(messages.registration.invalidEmail)(value),
       password: (value) =>
-        isNotEmpty(messages.register.passwordRequired)(value) ||
-        hasLength({ min: 6 }, messages.register.passwordTooShort)(value),
+        isNotEmpty(messages.registration.passwordRequired)(value) ||
+        hasLength({ min: 6 }, messages.registration.passwordTooShort)(value),
       confirmPassword: (value, values) =>
-        isNotEmpty(messages.register.confirmPasswordRequired)(value) ||
-        (value !== values.password ? messages.register.passwordsDoNotMatch : null),
+        isNotEmpty(messages.registration.confirmPasswordRequired)(value) ||
+        (value !== values.password ? messages.registration.passwordsDoNotMatch : null),
     },
     // validateInputOnChange: true,
     validateInputOnBlur: true,

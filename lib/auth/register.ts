@@ -13,13 +13,13 @@ import { messages } from '../messages';
 
 const RegisterSchema = z
   .object({
-    name: z.string().min(3, { message: messages.register.nameTooShort }),
-    email: z.string().email({ message: messages.register.invalidEmail }),
-    password: z.string().min(6, { message: messages.register.passwordTooShort }),
+    name: z.string().min(3, { message: messages.registration.nameTooShort }),
+    email: z.string().email({ message: messages.registration.invalidEmail }),
+    password: z.string().min(6, { message: messages.registration.passwordTooShort }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: messages.register.passwordsDoNotMatch,
+    message: messages.registration.passwordsDoNotMatch,
     path: ['confirmPassword'],
   });
 
@@ -45,7 +45,7 @@ export async function userRegistrationLogic(
       }
       return {
         success: null,
-        error: { ...error, general: messages.register.failed },
+        error: { ...error, general: messages.registration.failed },
       };
     }
 
@@ -57,8 +57,8 @@ export async function userRegistrationLogic(
         success: null,
         error: {
           ...error,
-          email: messages.register.emailTaken,
-          general: messages.register.failed,
+          email: messages.registration.emailTaken,
+          general: messages.registration.failed,
         },
       };
     }
@@ -71,13 +71,13 @@ export async function userRegistrationLogic(
       data: { name, email, password: hashed },
     });
 
-    return { success: messages.register.success, error: null };
+    return { success: messages.registration.success, error: null };
   } catch (e: any) {
     return {
       success: null,
       error: {
         ...error,
-        general: messages.register.failed,
+        general: messages.registration.failed,
       },
     };
   }
