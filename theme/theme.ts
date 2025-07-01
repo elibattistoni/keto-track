@@ -1,6 +1,7 @@
 'use client';
 
-import { createTheme } from '@mantine/core';
+import { Button, createTheme } from '@mantine/core';
+import buttonVariants from './ButtonVariants.module.css';
 
 export const theme = createTheme({
   /* Put your mantine theme override here */
@@ -29,5 +30,9 @@ export const theme = createTheme({
       '#0bae4a',
       '#00973c',
     ],
+  },
+
+  components: {
+    Button: Button.extend({ classNames: buttonVariants }),
   },
 });
