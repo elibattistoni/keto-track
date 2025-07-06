@@ -20,6 +20,12 @@ You can use this as a README section or developer setup guide.
 npm install next-auth @next-auth/prisma-adapter
 ```
 
+best with yarn
+
+```bash
+yarn add next-auth @next-auth/prisma-adapter
+```
+
 ---
 
 ## 2. Check Prisma Schema

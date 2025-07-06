@@ -386,6 +386,13 @@ npm install @prisma/client
 npm install prisma --save-dev
 ```
 
+actually, best with yarn
+
+```bash
+yarn add @prisma/client
+yarn add prisma --save-dev
+```
+
 ### **Step 2: Initialize Prisma**
 
 ```bash

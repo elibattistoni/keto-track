@@ -200,7 +200,7 @@ Stores tokens for email verification, password reset, etc.
 
 ##
 
-# HEREEEEEEEEEEEEE
+# HEREEEEEEEEEEEEE TODO ELISA CHECK
 
 ## **4. Add Mocked Users: Insert with Hashed Passwords**
 
@@ -208,6 +208,14 @@ Stores tokens for email verification, password reset, etc.
 npm install bcrypt
 npm install --save-dev @types/bcrypt
 npm install tsx --save-dev
+```
+
+best with yarn
+
+```bash
+yarn add bcrypt
+yarn add --save-dev @types/bcrypt
+yarn add tsx --save-dev
 ```
 
 **Example Node.js script (seed_users.ts):**

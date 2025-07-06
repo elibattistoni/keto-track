@@ -13,7 +13,7 @@ This template comes with the following features:
 - [Jest](https://jestjs.io/) setup with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
 - ESLint setup with [eslint-config-mantine](https://github.com/mantinedev/eslint-config-mantine)
 
-## npm scripts
+## npm scripts (run with yarn, not npm)
 
 ### Build and dev scripts
 
@@ -194,7 +194,7 @@ model User {
 ## Install all the packages needed:
 
 ```bash
-npm install
+yarn install
 ```
 
 ## Install PostgreSQL
@@ -265,5 +265,5 @@ and then
 ## Start the project locally:
 
 ```bash
-npm run dev
+yarn dev
 ```
