@@ -334,6 +334,30 @@ chmod +x init/script/00_run-all.sh
 
 in .env.local you should also add the NEXTAUTH_SECRET variable
 
+The NEXTAUTH_SECRET is required for NextAuth.js (Auth.js) to secure your authentication system. Here's why you need it and how it's determined:
+
+Why you need NEXTAUTH_SECRET:
+
+1. Session encryption: NextAuth uses this secret to encrypt and decrypt session tokens (JWTs)
+2. CSRF protection: It's used to generate and verify CSRF tokens
+3. Cookie signing: Secures authentication cookies to prevent tampering
+4. Security: Without it, your auth system would be vulnerable to attacks
+
+How it's determined:
+The secret should be a cryptographically secure random string. You can generate one using:
+run from the terminal this to generate a random string:
+
+```bash
+openssl rand -base64 32
+```
+
+Important notes:
+
+- Keep it secret: Never commit this to version control in production
+- Use different secrets: Use different values for development, staging, and production
+- Length: Should be at least 32 characters long
+- Production requirement: NextAuth.js requires this in production environments
+
 ## Step 3: Create the TablePlus connection + add data to the keto_track database
 
 You can add data in several ways. In this case, I am using the GUI TablePlus.
