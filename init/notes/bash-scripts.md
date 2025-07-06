@@ -36,5 +36,3 @@ chmod +x reset-prisma.sh
 ```bash
 ./reset-prisma.sh
 ```
-
-Prova prova
