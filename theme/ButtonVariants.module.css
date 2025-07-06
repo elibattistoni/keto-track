@@ -1,0 +1,18 @@
+.root[data-variant='example'] {
+  background-color: black;
+  color: white;
+  border-radius: 12px;
+  transition: background-color 500ms;
+
+  &:hover {
+    background: #52238d; /* Example hover color */
+    color: #fff;
+  }
+
+  .label {
+    color: magenta;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+  }
+}

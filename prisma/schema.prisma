@@ -7,9 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model accounts {
+model Account {
   id                  String  @id
-  user_id             String
+  user_id             String  @db.Uuid
   type                String
   provider            String
   provider_account_id String
@@ -20,9 +20,38 @@ model accounts {
   scope               String?
   id_token            String?
   session_state       String?
-  users               users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User                User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([provider, provider_account_id])
+}
+
+model Session {
+  id            String   @id
+  session_token String   @unique
+  user_id       String   @db.Uuid
+  expires       DateTime @db.Timestamp(6)
+  User          User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model User {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String?
+  email          String?   @unique
+  email_verified DateTime? @db.Timestamp(6)
+  image          String?
+  password       String?
+  role           Role      @default(starter)
+  Account        Account[]
+  Session        Session[]
+  meals          meals[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime @db.Timestamp(6)
+
+  @@id([identifier, token])
 }
 
 model foods {
@@ -53,43 +82,14 @@ model meal_foods {
 
 model meals {
   id         Int          @id @default(autoincrement())
-  user_id    String
+  user_id    String       @db.Uuid
   meal_time  DateTime     @db.Timestamp(6)
   notes      String?
   meal_foods meal_foods[]
-  users      users        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User       User         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-model sessions {
-  id            String   @id
-  session_token String   @unique
-  user_id       String
-  expires       DateTime @db.Timestamp(6)
-  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model users {
-  id             String     @id
-  name           String?
-  email          String?    @unique
-  email_verified DateTime?  @db.Timestamp(6)
-  image          String?
-  password       String?
-  role           user_role  @default(starter)
-  accounts       accounts[]
-  meals          meals[]
-  sessions       sessions[]
-}
-
-model verification_token {
-  identifier String
-  token      String   @unique
-  expires    DateTime @db.Timestamp(6)
-
-  @@id([identifier, token])
-}
-
-enum user_role {
+enum Role {
   admin
   starter
   premium
