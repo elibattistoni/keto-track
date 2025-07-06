@@ -318,7 +318,23 @@ SELECT user;
 <br>
 <br>
 
-## Step 3: add data to the keto_track database
+## Step 3.0
+
+### IMPORTANT NOTE
+
+NB: create the database connection with Table Plus, but after this Step 3, the rest of this doc is related to setup things for the first time from scratch. After creating the TablePlus db connection, you can just run the bash scripts that I created that do all the following automatically. i.e.:
+
+```bash
+chmod +x init/script/00_run-all.sh
+```
+
+```bash
+./init/script/00_run-all.sh
+```
+
+in .env.local you should also add the NEXTAUTH_SECRET variable
+
+## Step 3: Create the TablePlus connection + add data to the keto_track database
 
 You can add data in several ways. In this case, I am using the GUI TablePlus.
 
