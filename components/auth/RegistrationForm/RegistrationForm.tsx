@@ -54,7 +54,6 @@ export function RegistrationForm() {
 
   // this keeps in sync the state errors (from the server action) with the form errors (from Mantine useForm)
   useEffect(() => {
-    console.log('USE EFFECT TRIGGERED', state.error, form.errors);
 
     if (state?.error) {
       form.setErrors(state.error);
