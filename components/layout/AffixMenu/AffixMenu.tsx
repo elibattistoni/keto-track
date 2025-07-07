@@ -9,7 +9,7 @@ import { ActionIcon, Affix, Tooltip } from '@mantine/core';
 export const AffixMenu = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
+  const isAuthPage = pathname.includes('/login') || pathname.includes('/register');
 
   return (
     <Affix position={{ bottom: 20, right: 20 }}>
