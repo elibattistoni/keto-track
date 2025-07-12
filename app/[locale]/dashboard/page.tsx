@@ -23,9 +23,9 @@ export default async function DashboardPage({ params }: { params: { locale: 'en'
       {/* <h1>{t('greeting')}</h1>
       <h1>{t('foods')}</h1>
       <h1>{t('cart')}</h1> */}
-      <h1>{params.locale}</h1>
+      <h1>Locale: {params.locale}</h1>
       {/* {params.locale === 'it' ? food.name_it : food.name_en} */}
-      <div>Welcome to your dashboard, {session.user?.name || session.user?.email}!</div>;
+      <div>Welcome to your dashboard, {session.user?.name || session.user?.email}!</div>
     </div>
   );
 }

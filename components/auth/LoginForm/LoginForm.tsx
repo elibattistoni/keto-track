@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import {
@@ -21,6 +20,7 @@ import {
   Transition,
 } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
+import { Link } from '@/i18n/navigation';
 import { messages } from '@/lib/messages';
 import { LoginFormFields } from '@/types/registration';
 import { useLoginForm } from '../../../hooks/auth/use-login-form';

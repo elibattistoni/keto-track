@@ -1,6 +1,6 @@
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import { NextAuthSessionProvider } from '@/components/auth';
-import { AffixMenu, Header } from '@/components/layout';
+import { AuthButton, Header } from '@/components/layout';
 import { routing } from '@/i18n/routing';
 import { theme } from '@/theme';
 
@@ -48,7 +48,7 @@ export default async function RootLayout({
             <NextAuthSessionProvider>
               <Header />
               {children}
-              <AffixMenu />
+              <AuthButton />
             </NextAuthSessionProvider>
           </MantineProvider>
         </NextIntlClientProvider>

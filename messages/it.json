@@ -1,7 +1,8 @@
 {
   "HomePage": {
-    "title": "Ciao mondo!",
-    "greeting": "Ciao",
-    "about": "Vai alla pagina about"
+    "welcome": "Benvenuto su",
+    "login": "Entra!",
+    "logout": "Esci",
+    "home": "Home"
   }
 }

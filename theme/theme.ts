@@ -3,6 +3,8 @@
 import { Button, createTheme } from '@mantine/core';
 import buttonVariants from './ButtonVariants.module.css';
 
+import './globals.css';
+
 export const theme = createTheme({
   /* Put your mantine theme override here */
   colors: {

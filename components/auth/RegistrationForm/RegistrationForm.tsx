@@ -1,7 +1,6 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import IconAt from '@tabler/icons-react/dist/esm/icons/IconAt';
 import IconLock from '@tabler/icons-react/dist/esm/icons/IconLock';
@@ -24,6 +23,7 @@ import {
 } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
 import registerUser from '@/actions/auth/registerUser';
+import { Link } from '@/i18n/navigation';
 import { messages } from '@/lib/messages';
 import { RegistrationFormFields } from '@/types/registration';
 import { useRegisterForm } from '../../../hooks/auth/use-register-form';
@@ -54,7 +54,6 @@ export function RegistrationForm() {
 
   // this keeps in sync the state errors (from the server action) with the form errors (from Mantine useForm)
   useEffect(() => {
-
     if (state?.error) {
       form.setErrors(state.error);
     }

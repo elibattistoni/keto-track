@@ -1,7 +1,8 @@
 {
   "HomePage": {
-    "title": "Hello world!",
-    "greeting": "Hello",
-    "about": "Go to the about page"
+    "welcome": "Welcome to",
+    "login":"Come on in!",
+    "logout":"Logout",
+    "home":"Home"
   }
 }
