@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { getTranslations } from 'next-intl/server';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 //>> TODO fetch user-specific data from the database using session.user.email or session.user.id
 
-export default async function DashboardPage({ params }: { params: { locale: 'en' | 'it' } }) {
+export default async function DashboardPage({ params }: { params: Promise<{ locale: 'en' | 'it' }> }) {
   // when page loads, get the session on the server
   const session = await getServerSession(authOptions);
   const { locale } = await params;
