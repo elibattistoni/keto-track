@@ -23,4 +23,17 @@ export const messages = {
     checkEmail: 'Check your email',
     checkPassword: 'Check your password',
   },
+  passwordReset: {
+    emailSent: 'If an account with this email exists, you will receive a password reset link.',
+    success: 'Password reset successful! You can now log in with your new password.',
+    failed: 'Password reset failed. Please try again.',
+    invalidToken: 'Invalid or expired reset token.',
+    tokenExpired: 'Reset token has expired. Please request a new one.',
+    emailRequired: 'Email is required.',
+    invalidEmail: 'Invalid email address.',
+    passwordRequired: 'New password is required.',
+    passwordTooShort: 'Password must be at least 6 characters long.',
+    passwordsDoNotMatch: 'Passwords do not match.',
+    confirmPasswordRequired: 'Please confirm your password.',
+  },
 };

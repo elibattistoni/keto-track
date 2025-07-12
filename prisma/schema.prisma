@@ -25,6 +25,17 @@ model Account {
   @@unique([provider, provider_account_id])
 }
 
+model PasswordResetToken {
+  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email   String
+  token   String   @unique
+  expires DateTime @db.Timestamp(6)
+  used    Boolean  @default(false)
+
+  @@index([email], map: "idx_password_reset_email")
+  @@index([token], map: "idx_password_reset_token")
+}
+
 model Session {
   id            String   @id
   session_token String   @unique

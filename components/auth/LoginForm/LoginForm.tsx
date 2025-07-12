@@ -118,14 +118,19 @@ export function LoginForm() {
                       {...form.getInputProps('email')}
                       onChange={handleFieldChange('email')}
                     />
-                    <PasswordInput
-                      label="Password"
-                      placeholder="Your password"
-                      withAsterisk
-                      key={form.key('password')}
-                      {...form.getInputProps('password')}
-                      onChange={handleFieldChange('password')}
-                    />
+                    <Stack gap={2}>
+                      <PasswordInput
+                        label="Password"
+                        placeholder="Your password"
+                        withAsterisk
+                        key={form.key('password')}
+                        {...form.getInputProps('password')}
+                        onChange={handleFieldChange('password')}
+                      />
+                      <Anchor component={Link} href="/forgot-password" c="dimmed" size="xs">
+                        Forgot your password?
+                      </Anchor>
+                    </Stack>
 
                     <Group justify="space-between" mt="lg">
                       <Anchor component={Link} href="/register" c="dimmed" size="xs">

@@ -9,6 +9,7 @@ import { prisma } from '@/lib/prisma';
 export default async function DashboardPage({ params }: { params: { locale: 'en' | 'it' } }) {
   // when page loads, get the session on the server
   const session = await getServerSession(authOptions);
+  const { locale } = await params;
   // if not logged in, redirect to login
   if (!session) {
     redirect('/login');
@@ -23,7 +24,7 @@ export default async function DashboardPage({ params }: { params: { locale: 'en'
       {/* <h1>{t('greeting')}</h1>
       <h1>{t('foods')}</h1>
       <h1>{t('cart')}</h1> */}
-      <h1>Locale: {params.locale}</h1>
+      <h1>Locale: {locale}</h1>
       {/* {params.locale === 'it' ? food.name_it : food.name_en} */}
       <div>Welcome to your dashboard, {session.user?.name || session.user?.email}!</div>
     </div>

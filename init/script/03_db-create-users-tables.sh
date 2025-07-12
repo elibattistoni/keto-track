@@ -73,7 +73,20 @@ CREATE TABLE IF NOT EXISTS "VerificationToken" (
     PRIMARY KEY (identifier, token)
 );
 
--- 6. Meals table
+-- 6. Password reset tokens
+CREATE TABLE IF NOT EXISTS "PasswordResetToken" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT NOT NULL,
+    token TEXT UNIQUE NOT NULL,
+    expires TIMESTAMP NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_password_reset_email ON "PasswordResetToken"(email);
+CREATE INDEX IF NOT EXISTS idx_password_reset_token ON "PasswordResetToken"(token);
+
+-- 7. Meals table
 CREATE TABLE IF NOT EXISTS meals (
     id SERIAL PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
@@ -81,7 +94,7 @@ CREATE TABLE IF NOT EXISTS meals (
     notes TEXT
 );
 
--- 7. Meal_Foods table (many-to-many: meal <-> food)
+-- 8. Meal_Foods table (many-to-many: meal <-> food)
 CREATE TABLE IF NOT EXISTS meal_foods (
     meal_id INT NOT NULL REFERENCES meals(id) ON DELETE CASCADE,
     food_id INT NOT NULL REFERENCES foods(id) ON DELETE CASCADE,
