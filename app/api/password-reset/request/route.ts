@@ -1,3 +1,7 @@
+// API router for mobile/external password reset request (send email) functionality
+// ⚠️ TODO ELISA THIS IS NOT BEING USED AT THE MOMENT (needed for mobile/external app)
+// ⚠️ TODO TEST WITH POSTMAN
+
 import { NextRequest, NextResponse } from 'next/server';
 import { resetPassword } from '@/lib/reset-password';
 

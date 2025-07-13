@@ -9,11 +9,7 @@ interface SendPasswordResetEmailParams {
   userName?: string;
 }
 
-export async function passwordResetRequestAction({
-  email,
-  resetUrl,
-  userName,
-}: SendPasswordResetEmailParams) {
+export async function sendEmail({ email, resetUrl, userName }: SendPasswordResetEmailParams) {
   // Development mode: Log to console
   if (!process.env.RESEND_API_KEY || process.env.NODE_ENV === 'development') {
     console.log('\n📧 === PASSWORD RESET EMAIL (Development Mode) ===');

@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { z } from 'zod';
-import { passwordResetRequestAction as sendEmail } from '@/lib/email';
 import { messages } from '@/lib/messages';
 import { prisma } from '@/lib/prisma';
+import { sendEmail } from '@/lib/send-email';
 
 const ForgotPasswordSchema = z.object({
   email: z.string().email({ message: messages.passwordReset.invalidEmail }),

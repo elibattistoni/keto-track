@@ -1,6 +1,6 @@
 // API router for mobile/external user registration
 // ⚠️ TODO ELISA THIS IS NOT BEING USED AT THE MOMENT (needed for mobile/external app)
-// ✅ TESTED WITH POSTMAN
+// ⚠️ TODO TEST WITH POSTMAN
 import { NextRequest, NextResponse } from 'next/server';
 import { messages } from '@/lib/messages';
 import { registerUser } from '@/lib/register-user';
