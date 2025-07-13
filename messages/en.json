@@ -1,8 +1,43 @@
 {
   "HomePage": {
     "welcome": "Welcome to",
-    "login":"Come on in!",
-    "logout":"Logout",
-    "home":"Home"
+    "login": "Come on in!",
+    "logout": "Logout",
+    "home": "Home"
+  },
+  "Authentication": {
+    "LoginForm": {},
+    "registration": {
+      "success": "Registration successful! Logging you in...",
+      "failed": "Registration failed. Please try again.",
+      "emailTaken": "Email already registered.",
+      "nameTooShort": "Name must be at least 3 characters long.",
+      "nameRequired": "Name is required."
+    },
+    "login": {
+      "success": "Login successful! Redirecting to dashboard...",
+      "failed": "Login failed. Please check your credentials and try again.",
+      "autoLoginFailed": "Auto-login failed. Please log in manually.",
+      "checkEmail": "Check your email.",
+      "checkPassword": "Check your password."
+    },
+    "passwordReset": {
+      "emailSent": "An email with a password reset link was sent. Check your inbox and spam folders.",
+      "success": "Password reset successful! You can now log in with your new password.",
+      "failed": "Password reset failed. Please try again.",
+      "invalidToken": "Invalid or expired reset token.",
+      "tokenUsed": "Reset token has already been used.",
+      "tokenExpired": "Reset token has expired. Please request a new one.",
+      "notExistingEmail": "No account found with this email address."
+    },
+    "shared": {
+      "emailRequired": "Email is required",
+      "invalidEmail": "Invalid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordTooShort": "Password must be at least 6 characters long.",
+      "passwordsDoNotMatch": "Passwords do not match.",
+      "confirmPasswordRequired": "Please confirm your password.",
+      "allInvalid": "Invalid Input data. All fields are required."
+    }
   }
 }

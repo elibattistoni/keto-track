@@ -2,7 +2,7 @@
 // ⚠️ TODO ELISA THIS IS NOT BEING USED AT THE MOMENT (needed for mobile/external app)
 // ⚠️ TODO TEST WITH POSTMAN
 import { NextRequest, NextResponse } from 'next/server';
-import { messages } from '@/lib/messages';
+import { getTranslations } from 'next-intl/server';
 import { registerUser } from '@/lib/register-user';
 
 /*
@@ -13,6 +13,8 @@ import { registerUser } from '@/lib/register-user';
 */
 
 export async function POST(req: NextRequest) {
+  const t = await getTranslations('Authentication');
+
   try {
     // Validate Content-Type
     const contentType = req.headers.get('content-type');
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: null,
-          error: { general: 'All fields are required' },
+          error: { general: t('shared.allInvalid') },
         },
         { status: 400 }
       );
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: null,
-        error: { general: messages.registration.failed },
+        error: { general: t('registration.failed') },
       },
       {
         status: 500,

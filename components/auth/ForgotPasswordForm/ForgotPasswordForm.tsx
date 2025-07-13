@@ -22,11 +22,12 @@ import passwordResetRequestAction from '@/actions/auth/password-reset-request-ac
 import { AnimatedBackground } from '@/components/layout';
 import { useForgotPasswordForm } from '@/hooks/use-forgot-password-form';
 import { Link } from '@/i18n/navigation';
-import { messages } from '@/lib/messages';
-import { ForgotPasswordFormFields } from '@/types/password-reset';
+import { useTranslations } from 'next-intl';
+import { ForgotPasswordFormFields } from '@/types/auth';
 
 export const ForgotPasswordForm = () => {
   const mounted = useMounted();
+  const t = useTranslations('Authentication');
 
   const [state, formAction, isPending] = useActionState(passwordResetRequestAction, {
     success: null,
@@ -83,8 +84,8 @@ export const ForgotPasswordForm = () => {
             children: message && (
               <Alert color={message === 'error' ? 'red' : 'green'} mt="500px">
                 {message === 'error'
-                  ? messages.passwordReset.failed
-                  : messages.passwordReset.emailSent}
+                  ? t('passwordReset.failed')
+                  : t('passwordReset.emailSent')}
               </Alert>
             ),
           }}

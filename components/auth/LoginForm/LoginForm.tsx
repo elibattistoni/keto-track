@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import {
   Alert,
   Anchor,
@@ -20,18 +21,18 @@ import {
   Transition,
 } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
+import { AnimatedBackground, KetoTrack } from '@/components/layout';
+import { useLoginForm } from '@/hooks/use-login-form';
 import { Link } from '@/i18n/navigation';
-import { messages } from '@/lib/messages';
-import { LoginFormFields } from '@/types/registration';
-import { useLoginForm } from '../../../hooks/use-login-form';
-import { AnimatedBackground } from '../../layout/AnimatedBackground/AnimatedBackground';
-import { KetoTrack } from '../../layout/KetoTrack/KetoTrack';
+import { LoginFormFields } from '@/types/auth';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
 
-// TODO improve code with LoadingOverlay & message
+//>> TODO ADD TRANSLATIONS FOR FORMS
+//>> TODO FIX HEADER FOR AUTH PAGES
 
 export function LoginForm() {
   const router = useRouter();
+  const t = useTranslations('Authentication');
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<null | 'success' | 'error'>(null);
   const showOverlay = loading || !!message;
@@ -60,8 +61,8 @@ export function LoginForm() {
 
     if (res?.error) {
       setMessage('error');
-      form.setFieldError('email', messages.login.checkEmail);
-      form.setFieldError('password', messages.login.checkPassword);
+      form.setFieldError('email', t('login.checkEmail'));
+      form.setFieldError('password', t('login.checkPassword'));
     } else {
       setMessage('success');
       setTimeout(() => router.push('/dashboard'), 1000);
@@ -87,7 +88,7 @@ export function LoginForm() {
           loaderProps={{
             children: message && (
               <Alert color={message === 'error' ? 'red' : 'green'} mt="500px">
-                {message === 'error' ? messages.login.failed : messages.login.success}
+                {message === 'error' ? t('login.failed') : t('login.success')}
               </Alert>
             ),
           }}

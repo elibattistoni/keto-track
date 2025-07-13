@@ -15,9 +15,9 @@ export function Header() {
     pathname.includes('/forgot-password') ||
     pathname.includes('/reset-password');
 
-  if (isAuthPage) {
-    return null;
-  }
+  // if (isAuthPage) {
+  //   return null;
+  // }
 
   return (
     <header>

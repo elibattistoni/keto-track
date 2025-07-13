@@ -1,8 +1,11 @@
+import { useTranslations } from 'next-intl';
 import { hasLength, isEmail, isNotEmpty, useForm } from '@mantine/form';
-import { messages } from '@/lib/messages';
-import { RegistrationFormFields } from '@/types/registration';
+import { RegistrationFormFields } from '@/types/auth';
 
 export function useRegisterForm() {
+  // hook used in client side component
+  const t = useTranslations('Authentication');
+
   return useForm<RegistrationFormFields>({
     initialValues: {
       name: '',
@@ -12,17 +15,16 @@ export function useRegisterForm() {
     },
     validate: {
       name: (value) =>
-        isNotEmpty(messages.registration.nameRequired)(value) ||
-        hasLength({ min: 3 }, messages.registration.nameTooShort)(value),
+        isNotEmpty(t('registration.nameRequired'))(value) ||
+        hasLength({ min: 3 }, t('registration.nameTooShort'))(value),
       email: (value) =>
-        isNotEmpty(messages.registration.emailRequired)(value) ||
-        isEmail(messages.registration.invalidEmail)(value),
+        isNotEmpty(t('shared.emailRequired'))(value) || isEmail(t('shared.invalidEmail'))(value),
       password: (value) =>
-        isNotEmpty(messages.registration.passwordRequired)(value) ||
-        hasLength({ min: 6 }, messages.registration.passwordTooShort)(value),
+        isNotEmpty(t('shared.passwordRequired'))(value) ||
+        hasLength({ min: 6 }, t('shared.passwordTooShort'))(value),
       confirmPassword: (value, values) =>
-        isNotEmpty(messages.registration.confirmPasswordRequired)(value) ||
-        (value !== values.password ? messages.registration.passwordsDoNotMatch : null),
+        isNotEmpty(t('shared.confirmPasswordRequired'))(value) ||
+        (value !== values.password ? t('shared.passwordsDoNotMatch') : null),
     },
     // validateInputOnChange: true,
     validateInputOnBlur: true,

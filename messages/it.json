@@ -4,5 +4,39 @@
     "login": "Entra!",
     "logout": "Esci",
     "home": "Home"
+  },
+  "Authentication": {
+    "registration": {
+      "success": "Registrazione avvenuta con successo! Accesso in corso...",
+      "failed": "Registrazione fallita. Riprova.",
+      "emailTaken": "Email già registrata.",
+      "nameTooShort": "Il nome deve contenere almeno 3 caratteri.",
+      "nameRequired": "Il nome è obbligatorio."
+    },
+    "login": {
+      "success": "Accesso effettuato con successo! Reindirizzamento alla dashboard...",
+      "failed": "Accesso fallito. Controlla le credenziali e riprova.",
+      "autoLoginFailed": "Accesso automatico fallito. Effettua l'accesso manualmente.",
+      "checkEmail": "Controlla la tua email.",
+      "checkPassword": "Controlla la tua password."
+    },
+    "passwordReset": {
+      "emailSent": "È stata inviata un'email con il link per reimpostare la password. Controlla la posta in arrivo e la cartella spam.",
+      "success": "Reimpostazione della password avvenuta con successo! Ora puoi accedere con la nuova password.",
+      "failed": "Reimpostazione della password fallita. Riprova.",
+      "invalidToken": "Token di reimpostazione non valido o scaduto.",
+      "tokenExpired": "Il token di reimpostazione è scaduto. Richiedi un nuovo token.",
+      "tokenUsed": "Il token di reimpostazione è già stato utilizzato.",
+      "notExistingEmail": "Nessun account trovato con questo indirizzo email."
+    },
+    "shared": {
+      "emailRequired": "L'email è obbligatoria.",
+      "invalidEmail": "Indirizzo email non valido.",
+      "passwordRequired": "La password è obbligatoria.",
+      "passwordTooShort": "La password deve contenere almeno 6 caratteri.",
+      "passwordsDoNotMatch": "Le password non corrispondono.",
+      "confirmPasswordRequired": "Conferma la tua password.",
+      "allInvalid": "Dati non validi. Tutti i campi sono obbligatori."
+    }
   }
 }

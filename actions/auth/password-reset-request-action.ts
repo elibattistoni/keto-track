@@ -2,7 +2,7 @@
 
 import { delay } from '@/lib/delay';
 import { resetPassword } from '@/lib/reset-password';
-import { ForgotPasswordFormError, SendPasswordResetEmailResponse } from '@/types/password-reset';
+import { FormError, SendPasswordResetEmailResponse } from '@/types/password-reset';
 
 export default async function passwordResetRequestAction(
   prevState: SendPasswordResetEmailResponse,
@@ -20,12 +20,12 @@ export default async function passwordResetRequestAction(
       error: null,
     };
   } else {
-    const error: ForgotPasswordFormError = { email: null, general: null };
+    const error: FormError = { email: null, general: null };
 
     // Map errors to your form format
     if (result.errors) {
       Object.keys(result.errors).forEach((key) => {
-        error[key as keyof ForgotPasswordFormError] = result.errors![key];
+        error[key as keyof FormError] = result.errors![key];
       });
     }
 

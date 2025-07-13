@@ -24,8 +24,8 @@ import {
 import { useMounted } from '@mantine/hooks';
 import registerUserAction from '@/actions/auth/register-user-action';
 import { Link } from '@/i18n/navigation';
-import { messages } from '@/lib/messages';
-import { RegistrationFormFields } from '@/types/registration';
+import { useTranslations } from 'next-intl';
+import { RegistrationFormFields } from '@/types/auth';
 import { useRegisterForm } from '../../../hooks/use-register-form';
 import { AnimatedBackground } from '../../layout/AnimatedBackground/AnimatedBackground';
 import { KetoTrack } from '../../layout/KetoTrack/KetoTrack';
@@ -35,6 +35,7 @@ import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
 export function RegistrationForm() {
   const router = useRouter();
   const mounted = useMounted();
+  const t = useTranslations('Authentication');
 
   const [state, formAction, isPending] = useActionState(registerUserAction, {
     success: null,
@@ -89,7 +90,7 @@ export function RegistrationForm() {
 
         // if there was an error, show it
         if (res && res.error) {
-          form.setErrors({ ...form.errors, general: messages.login.autoLoginFailed });
+          form.setErrors({ ...form.errors, general: t('login.autoLoginFailed') });
           setMessage('error');
         }
       }, 1200); // 1.2 seconds before auto-login
@@ -130,7 +131,7 @@ export function RegistrationForm() {
           loaderProps={{
             children: message && (
               <Alert color={message === 'error' ? 'red' : 'green'} mt="500px">
-                {message === 'error' ? messages.registration.failed : messages.registration.success}
+                {message === 'error' ? t('registration.failed') : t('registration.success')}
               </Alert>
             ),
           }}

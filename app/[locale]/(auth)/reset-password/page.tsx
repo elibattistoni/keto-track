@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   Alert,
   Anchor,
@@ -14,12 +15,12 @@ import {
   Title,
 } from '@mantine/core';
 import { Link } from '@/i18n/navigation';
-import { messages } from '@/lib/messages';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const t = useTranslations('Authentication');
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -31,7 +32,7 @@ export default function ResetPasswordPage() {
     if (!token) {
       setMessage({
         type: 'error',
-        text: messages.passwordReset.invalidToken,
+        text: t('passwordReset.invalidToken'),
       });
     }
   }, [token]);
@@ -40,15 +41,15 @@ export default function ResetPasswordPage() {
     const newErrors: { password?: string; confirmPassword?: string } = {};
 
     if (!password) {
-      newErrors.password = messages.passwordReset.passwordRequired;
+      newErrors.password = t('shared.passwordRequired');
     } else if (password.length < 6) {
-      newErrors.password = messages.passwordReset.passwordTooShort;
+      newErrors.password = t('shared.passwordTooShort');
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = messages.passwordReset.confirmPasswordRequired;
+      newErrors.confirmPassword = t('shared.confirmPasswordRequired');
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = messages.passwordReset.passwordsDoNotMatch;
+      newErrors.confirmPassword = t('shared.passwordsDoNotMatch');
     }
 
     setErrors(newErrors);
@@ -66,7 +67,7 @@ export default function ResetPasswordPage() {
     if (!token) {
       setMessage({
         type: 'error',
-        text: messages.passwordReset.invalidToken,
+        text: t('passwordReset.invalidToken'),
       });
       return;
     }
@@ -87,7 +88,7 @@ export default function ResetPasswordPage() {
       if (result.success) {
         setMessage({
           type: 'success',
-          text: messages.passwordReset.success,
+          text: t('passwordReset.success'),
         });
         // Redirect to login after 2 seconds
         setTimeout(() => {
@@ -96,13 +97,13 @@ export default function ResetPasswordPage() {
       } else {
         setMessage({
           type: 'error',
-          text: result.message || messages.passwordReset.failed,
+          text: result.message || t('passwordReset.failed'),
         });
       }
     } catch (error) {
       setMessage({
         type: 'error',
-        text: messages.passwordReset.failed,
+        text: t('passwordReset.failed'),
       });
     } finally {
       setLoading(false);
@@ -117,7 +118,7 @@ export default function ResetPasswordPage() {
             <Title order={2} ta="center">
               Invalid Reset Link
             </Title>
-            <Alert color="red">{messages.passwordReset.invalidToken}</Alert>
+            <Alert color="red">{t('passwordReset.invalidToken')}</Alert>
             <Anchor component={Link} href="/forgot-password" ta="center">
               Request a new reset link
             </Anchor>

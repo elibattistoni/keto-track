@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
+import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { messages } from '@/lib/messages';
-
-const ConfirmResetSchema = z.object({
-  token: z.string().min(1),
-  password: z.string().min(6, { message: messages.passwordReset.passwordTooShort }),
-});
 
 export async function POST(request: NextRequest) {
+  const t = await getTranslations('Authentication');
+
+  const ConfirmResetSchema = z.object({
+    token: z.string().min(1),
+    password: z.string().min(6, { message: t('shared.passwordTooShort') }),
+  });
+
   try {
     const body = await request.json();
     const result = ConfirmResetSchema.safeParse(body);
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           errors: result.error.flatten().fieldErrors,
-          message: 'Invalid input data.',
+          message: t('shared.allInvalid'),
         },
         { status: 400 }
       );
@@ -37,9 +39,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: resetToken?.used 
-            ? 'Reset link has already been used.' 
-            : messages.passwordReset.tokenExpired,
+          message: resetToken?.used
+            ? t('passwardReset.tokenUsed')
+            : t('passwardReset.tokenExpired'),
         },
         { status: 400 }
       );
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: messages.passwordReset.invalidToken,
+          message: t('passwardReset.invalidToken'),
         },
         { status: 400 }
       );
@@ -79,14 +81,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: messages.passwordReset.success,
+      message: t('passwardReset.success'),
     });
   } catch (error) {
     console.error('Password reset confirmation error:', error);
     return NextResponse.json(
       {
         success: false,
-        message: 'An error occurred. Please try again.',
+        message: t('passwardReset.failed'),
       },
       { status: 500 }
     );

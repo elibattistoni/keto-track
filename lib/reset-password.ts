@@ -1,12 +1,8 @@
 import crypto from 'crypto';
+import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
-import { messages } from '@/lib/messages';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/send-email';
-
-const ForgotPasswordSchema = z.object({
-  email: z.string().email({ message: messages.passwordReset.invalidEmail }),
-});
 
 export interface PasswordResetResult {
   success: boolean;
@@ -15,6 +11,12 @@ export interface PasswordResetResult {
 }
 
 export async function resetPassword(email: string): Promise<PasswordResetResult> {
+  const t = await getTranslations('Authentication');
+
+  const ForgotPasswordSchema = z.object({
+    email: z.string().email({ message: t('shared.invalidEmail') }),
+  });
+
   try {
     // Validate input
     const result = ForgotPasswordSchema.safeParse({ email });
@@ -26,7 +28,7 @@ export async function resetPassword(email: string): Promise<PasswordResetResult>
       }
       return {
         success: false,
-        message: messages.passwordReset.failed,
+        message: t('passwordReset.failed'),
         errors,
       };
     }
@@ -37,9 +39,9 @@ export async function resetPassword(email: string): Promise<PasswordResetResult>
     if (!user) {
       return {
         success: false,
-        message: messages.passwordReset.failed,
+        message: t('passwordReset.failed'),
         errors: {
-          email: messages.passwordReset.notExistingEmail,
+          email: t('passwordReset.notExistingEmail'),
         },
       };
     }
@@ -85,13 +87,13 @@ export async function resetPassword(email: string): Promise<PasswordResetResult>
 
     return {
       success: true,
-      message: messages.passwordReset.emailSent,
+      message: t('passwordReset.emailSent'),
     };
   } catch (error) {
     console.error('Password reset error:', error);
     return {
       success: false,
-      message: messages.passwordReset.failed,
+      message: t('passwordReset.failed'),
     };
   }
 }

@@ -3,7 +3,7 @@
 // server action for internal web app registration
 import { delay } from '@/lib/delay';
 import { registerUser } from '@/lib/register-user';
-import { RegisterUserResponse } from '@/types/registration';
+import { RegisterUserResponse } from '@/types/auth';
 
 export default async function registerUserAction(
   prevState: RegisterUserResponse,
