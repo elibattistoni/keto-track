@@ -10,7 +10,11 @@ import { Link } from '@/i18n/navigation';
 export const AuthButton = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const isAuthPage = pathname.includes('/login') || pathname.includes('/register');
+  const isAuthPage =
+    pathname.includes('/login') ||
+    pathname.includes('/register') ||
+    pathname.includes('/forgot-password') ||
+    pathname.includes('/reset-password');
   const t = useTranslations('HomePage');
 
   return (

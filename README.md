@@ -262,7 +262,7 @@ and then
 ./init/script/00_run-all.sh
 ```
 
-## Start the project locally:
+## Start the project locally: IMPORTANT use yarn, not npm as this can cause issues
 
 ```bash
 yarn dev

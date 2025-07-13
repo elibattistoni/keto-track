@@ -78,8 +78,8 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 - in `components/RegistrationForm/RegistrationForm.tsx`:
   - `useForm` (from Mantine) performs client-side validation
-  - `useActionState` is linked to the server action `registerUser` (in `app/register/actions.ts`) and calls this server action when the submit button is clicked; it also updates the UI with messages from the server action if there are any errors
-  - the form's `action` posts to the server action `registerUser` which does secure validation and DB logic
+  - `useActionState` is linked to the server action `registerUserAction` (in `app/register/actions.ts`) and calls this server action when the submit button is clicked; it also updates the UI with messages from the server action if there are any errors
+  - the form's `action` posts to the server action `registerUserAction` which does secure validation and DB logic
 
   A note about this:
 
@@ -172,17 +172,17 @@ Your registration implementation is **very solid and aligns well with modern bes
 
 ### ✅ What’s Good About Your Registration Flow
 
-| Practice                          | Your Implementation                                                   | Why it’s Good                      |
-| :-------------------------------- | :-------------------------------------------------------------------- | :--------------------------------- |
-| **Separation of concerns**        | Registration is handled separately from authentication (next-auth)    | Keeps code maintainable and clear  |
-| **Server-side validation**        | Uses Zod schema in `userRegistrationLogic`                            | Ensures only valid data is stored  |
-| **Client-side validation**        | Uses Mantine’s form validation                                        | Gives instant feedback to the user |
-| **Password hashing**              | Uses bcrypt before storing in DB                                      | Secure, industry standard          |
-| **No duplicate emails**           | Checks for existing user before creating                              | Prevents account collisions        |
-| **Shared logic**                  | `userRegistrationLogic` is reused between server action and API route | DRY, easy to maintain              |
-| **API route for mobile/external** | `/api/register/route.ts`                                              | Enables future flexibility         |
-| **Good error handling**           | Returns structured errors for both validation and system errors       | UX and debugging friendly          |
-| **No sensitive data leak**        | No password or sensitive info sent to the client                      | Secure                             |
+| Practice                          | Your Implementation                                                | Why it’s Good                      |
+| :-------------------------------- | :----------------------------------------------------------------- | :--------------------------------- |
+| **Separation of concerns**        | Registration is handled separately from authentication (next-auth) | Keeps code maintainable and clear  |
+| **Server-side validation**        | Uses Zod schema in `registerUser`                                  | Ensures only valid data is stored  |
+| **Client-side validation**        | Uses Mantine’s form validation                                     | Gives instant feedback to the user |
+| **Password hashing**              | Uses bcrypt before storing in DB                                   | Secure, industry standard          |
+| **No duplicate emails**           | Checks for existing user before creating                           | Prevents account collisions        |
+| **Shared logic**                  | `registerUser` is reused between server action and API route       | DRY, easy to maintain              |
+| **API route for mobile/external** | `/api/register/route.ts`                                           | Enables future flexibility         |
+| **Good error handling**           | Returns structured errors for both validation and system errors    | UX and debugging friendly          |
+| **No sensitive data leak**        | No password or sensitive info sent to the client                   | Secure                             |
 
 ---
 

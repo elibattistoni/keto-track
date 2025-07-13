@@ -9,7 +9,7 @@ import {
   RegistrationFormError,
   RegistrationFormFields,
 } from '@/types/registration';
-import { messages } from '../messages';
+import { messages } from './messages';
 
 const RegisterSchema = z
   .object({
@@ -23,9 +23,7 @@ const RegisterSchema = z
     path: ['confirmPassword'],
   });
 
-export async function userRegistrationLogic(
-  input: RegistrationFormFields
-): Promise<RegisterUserResponse> {
+export async function registerUser(input: RegistrationFormFields): Promise<RegisterUserResponse> {
   const error: RegistrationFormError = {
     name: null,
     email: null,

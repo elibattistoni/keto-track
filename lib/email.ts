@@ -9,7 +9,7 @@ interface SendPasswordResetEmailParams {
   userName?: string;
 }
 
-export async function sendPasswordResetEmail({
+export async function passwordResetRequestAction({
   email,
   resetUrl,
   userName,

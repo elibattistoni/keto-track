@@ -1,11 +1,11 @@
 'use server';
 
 // server action for internal web app registration
-import { userRegistrationLogic } from '@/lib/auth/register';
 import { delay } from '@/lib/delay';
+import { registerUser } from '@/lib/register-user';
 import { RegisterUserResponse } from '@/types/registration';
 
-export default async function registerUser(
+export default async function registerUserAction(
   prevState: RegisterUserResponse,
   formData: FormData
 ): Promise<RegisterUserResponse> {
@@ -16,5 +16,5 @@ export default async function registerUser(
 
   await delay(2000);
 
-  return userRegistrationLogic({ name, email, password, confirmPassword });
+  return registerUser({ name, email, password, confirmPassword });
 }

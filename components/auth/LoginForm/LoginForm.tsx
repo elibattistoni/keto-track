@@ -23,7 +23,7 @@ import { useMounted } from '@mantine/hooks';
 import { Link } from '@/i18n/navigation';
 import { messages } from '@/lib/messages';
 import { LoginFormFields } from '@/types/registration';
-import { useLoginForm } from '../../../hooks/auth/use-login-form';
+import { useLoginForm } from '../../../hooks/use-login-form';
 import { AnimatedBackground } from '../../layout/AnimatedBackground/AnimatedBackground';
 import { KetoTrack } from '../../layout/KetoTrack/KetoTrack';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
@@ -118,7 +118,7 @@ export function LoginForm() {
                       {...form.getInputProps('email')}
                       onChange={handleFieldChange('email')}
                     />
-                    <Stack gap={2}>
+                    <Stack gap="xxs">
                       <PasswordInput
                         label="Password"
                         placeholder="Your password"

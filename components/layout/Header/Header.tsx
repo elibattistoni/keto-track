@@ -9,7 +9,11 @@ import { LocaleSwitcher } from '../LocaleSwitcher/LocaleSwitcher';
 
 export function Header() {
   const pathname = usePathname();
-  const isAuthPage = pathname.includes('/login') || pathname.includes('/register');
+  const isAuthPage =
+    pathname.includes('/login') ||
+    pathname.includes('/register') ||
+    pathname.includes('/forgot-password') ||
+    pathname.includes('/reset-password');
 
   if (isAuthPage) {
     return null;

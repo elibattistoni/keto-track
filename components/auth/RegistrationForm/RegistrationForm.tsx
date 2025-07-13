@@ -22,11 +22,11 @@ import {
   Transition,
 } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
-import registerUser from '@/actions/auth/registerUser';
+import registerUserAction from '@/actions/auth/register-user-action';
 import { Link } from '@/i18n/navigation';
 import { messages } from '@/lib/messages';
 import { RegistrationFormFields } from '@/types/registration';
-import { useRegisterForm } from '../../../hooks/auth/use-register-form';
+import { useRegisterForm } from '../../../hooks/use-register-form';
 import { AnimatedBackground } from '../../layout/AnimatedBackground/AnimatedBackground';
 import { KetoTrack } from '../../layout/KetoTrack/KetoTrack';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
@@ -36,7 +36,7 @@ export function RegistrationForm() {
   const router = useRouter();
   const mounted = useMounted();
 
-  const [state, formAction, isPending] = useActionState(registerUser, {
+  const [state, formAction, isPending] = useActionState(registerUserAction, {
     success: null,
     error: null,
   });

@@ -7,6 +7,10 @@ import './globals.css';
 
 export const theme = createTheme({
   /* Put your mantine theme override here */
+  spacing: {
+    xxs: '4px',
+  },
+  
   colors: {
     brandViolet: [
       '#f6eeff',
