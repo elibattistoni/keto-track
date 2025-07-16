@@ -52,15 +52,19 @@ export const UserMenu = () => {
   const { data: session } = useSession();
   const t = useTranslations('HomePage');
 
-  return (
-    <Tooltip label={session ? t('logout') : t('login')} position="left">
-      {session ? (
+  if (session) {
+    return (
+      <Tooltip label="Menu" position="left">
         <UserSessionMenu />
-      ) : (
+      </Tooltip>
+    );
+  } else {
+    return (
+      <Tooltip label={t('login')} position="left">
         <ActionIcon component={Link} href="/login" variant="default">
           <IconLogin2 size={20} />
         </ActionIcon>
-      )}
-    </Tooltip>
-  );
+      </Tooltip>
+    );
+  }
 };

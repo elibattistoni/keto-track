@@ -1,6 +1,6 @@
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import { NextAuthSessionProvider } from '@/components/auth';
-import { Header } from '@/components/layout';
+import { Header, PageContainer } from '@/components/layout';
 import { routing } from '@/i18n/routing';
 import { theme } from '@/theme';
 
@@ -47,7 +47,7 @@ export default async function RootLayout({
           <MantineProvider theme={theme} defaultColorScheme="light">
             <NextAuthSessionProvider>
               <Header />
-              {children}
+              <PageContainer>{children}</PageContainer>
             </NextAuthSessionProvider>
           </MantineProvider>
         </NextIntlClientProvider>
