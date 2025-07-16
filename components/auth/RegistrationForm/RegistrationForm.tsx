@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import IconAt from '@tabler/icons-react/dist/esm/icons/IconAt';
 import IconLock from '@tabler/icons-react/dist/esm/icons/IconLock';
 import { signIn } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import {
   Alert,
   Anchor,
@@ -24,10 +25,8 @@ import {
 import { useMounted } from '@mantine/hooks';
 import registerUserAction from '@/actions/auth/register-user-action';
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
 import { RegistrationFormFields } from '@/types/auth';
 import { useRegisterForm } from '../../../hooks/use-register-form';
-import { AnimatedBackground } from '../../layout/AnimatedBackground/AnimatedBackground';
 import { KetoTrack } from '../../layout/KetoTrack/KetoTrack';
 import { GoogleButton } from '../GoogleButton/GoogleButton';
 import { StrengthMeterPasswordInput } from './StrengthMeterPasswordInput';
@@ -122,7 +121,6 @@ export function RegistrationForm() {
 
   return (
     <>
-      <AnimatedBackground />
       <Portal>
         <LoadingOverlay
           visible={showOverlay}

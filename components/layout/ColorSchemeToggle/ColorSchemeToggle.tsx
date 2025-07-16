@@ -19,7 +19,7 @@ export function ColorSchemeToggle() {
         aria-label="Color Scheme"
         onClick={() => (colorScheme === 'light' ? setColorScheme('dark') : setColorScheme('light'))}
       >
-        {colorScheme === 'dark' ? <IconSun /> : <IconMoon />}
+        {colorScheme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
       </ActionIcon>
     </Tooltip>
   );

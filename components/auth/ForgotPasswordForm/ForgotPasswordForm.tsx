@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react';
 import { IconAt } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import {
   Alert,
   Anchor,
@@ -19,10 +20,8 @@ import {
 } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
 import passwordResetRequestAction from '@/actions/auth/password-reset-request-action';
-import { AnimatedBackground } from '@/components/layout';
 import { useForgotPasswordForm } from '@/hooks/use-forgot-password-form';
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
 import { ForgotPasswordFormFields } from '@/types/auth';
 
 export const ForgotPasswordForm = () => {
@@ -74,7 +73,6 @@ export const ForgotPasswordForm = () => {
 
   return (
     <>
-      <AnimatedBackground />
       <Portal>
         <LoadingOverlay
           visible={showOverlay}
@@ -83,9 +81,7 @@ export const ForgotPasswordForm = () => {
           loaderProps={{
             children: message && (
               <Alert color={message === 'error' ? 'red' : 'green'} mt="500px">
-                {message === 'error'
-                  ? t('passwordReset.failed')
-                  : t('passwordReset.emailSent')}
+                {message === 'error' ? t('passwordReset.failed') : t('passwordReset.emailSent')}
               </Alert>
             ),
           }}

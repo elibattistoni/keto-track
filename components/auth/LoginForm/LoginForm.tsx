@@ -21,7 +21,7 @@ import {
   Transition,
 } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
-import { AnimatedBackground, KetoTrack } from '@/components/layout';
+import { KetoTrack } from '@/components/layout';
 import { useLoginForm } from '@/hooks/use-login-form';
 import { Link } from '@/i18n/navigation';
 import { LoginFormFields } from '@/types/auth';
@@ -79,7 +79,6 @@ export function LoginForm() {
 
   return (
     <>
-      <AnimatedBackground />
       <Portal>
         <LoadingOverlay
           visible={showOverlay}
