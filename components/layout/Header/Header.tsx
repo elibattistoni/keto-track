@@ -2,10 +2,10 @@
 
 import { Flex } from '@mantine/core';
 import { Link } from '@/i18n/navigation';
-import { AuthButton } from '../AuthButton/AuthButton';
 import { ColorSchemeToggle } from '../ColorSchemeToggle/ColorSchemeToggle';
 import { KetoTrack } from '../KetoTrack/KetoTrack';
 import { LocaleSwitcher } from '../LocaleSwitcher/LocaleSwitcher';
+import { UserMenu } from '../UserMenu/UserMenu';
 
 export function Header() {
   return (
@@ -15,7 +15,7 @@ export function Header() {
           <KetoTrack fw={800} fz="lg" />
         </Link>
         <Flex justify="right" align="center" gap="sm">
-          <AuthButton />
+          <UserMenu />
           <LocaleSwitcher />
           <ColorSchemeToggle />
         </Flex>

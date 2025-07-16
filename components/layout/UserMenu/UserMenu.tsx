@@ -26,7 +26,7 @@ const UserSessionMenu = () => {
   );
 };
 
-export const AuthButton = () => {
+export const UserMenu = () => {
   const { data: session } = useSession();
   const t = useTranslations('HomePage');
 
